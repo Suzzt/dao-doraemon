@@ -27,6 +27,10 @@ import org.dao.doraemon.database.crypto.server.CryptoServer;
 import org.dao.doraemon.database.crypto.util.FieldReflectorUtil;
 import org.dao.doraemon.database.crypto.util.ThreadLocalUtil;
 
+/**
+ * @author wuzhenhong
+ * @date 2024/12/27 9:48
+ */
 @Intercepts({@Signature(type = ParameterHandler.class, method = "setParameters", args = {
     PreparedStatement.class})})
 public class FieldEncryptBeforeInterceptor implements Interceptor {
