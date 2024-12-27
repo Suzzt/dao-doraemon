@@ -22,6 +22,7 @@ import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import org.dao.doraemon.database.crypto.annotated.Crypto;
 import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshotBo;
+import org.dao.doraemon.database.crypto.constant.MybatisFieldNameCons;
 import org.dao.doraemon.database.crypto.server.CryptoServer;
 import org.dao.doraemon.database.crypto.util.FieldReflectorUtil;
 import org.dao.doraemon.database.crypto.util.ThreadLocalUtil;
@@ -39,12 +40,12 @@ public class FieldEncryptBeforeInterceptor implements Interceptor {
         ParameterHandler parameterHandler = (ParameterHandler) invocation.getTarget();
         MetaObject metaObject = MetaObject.forObject(parameterHandler, OBJECT_FACTORY, OBJECT_WRAPPER_FACTORY,
             REFLECTOR_FACTORY);
-        MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("mappedStatement");
+        MappedStatement mappedStatement = (MappedStatement) metaObject.getValue(MybatisFieldNameCons.MAPPED_STATEMENT);
         SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
         // 只处理dml语句
         if (SqlCommandType.INSERT == sqlCommandType ||
             SqlCommandType.UPDATE == sqlCommandType) {
-            BoundSql boundSql = (BoundSql) metaObject.getValue("boundSql");
+            BoundSql boundSql = (BoundSql) metaObject.getValue(MybatisFieldNameCons.BOUND_SQL);
             Object parameter = parameterHandler.getParameterObject();
             try {
                 this.execEncrypt(parameter);

@@ -19,6 +19,7 @@ import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshotBo;
+import org.dao.doraemon.database.crypto.constant.MybatisFieldNameCons;
 
 @Intercepts({@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {
     Statement.class})})
@@ -34,12 +35,12 @@ public class FieldEncryptAfterInterceptor implements Interceptor {
         ResultSetHandler resultSetHandler = (ResultSetHandler) invocation.getTarget();
         MetaObject metaObject = MetaObject.forObject(resultSetHandler, OBJECT_FACTORY, OBJECT_WRAPPER_FACTORY,
             REFLECTOR_FACTORY);
-        MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("mappedStatement");
+        MappedStatement mappedStatement = (MappedStatement) metaObject.getValue(MybatisFieldNameCons.MAPPED_STATEMENT);
         SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
         // 只处理dml语句
         if (SqlCommandType.INSERT == sqlCommandType ||
             SqlCommandType.UPDATE == sqlCommandType) {
-            BoundSql boundSql = (BoundSql) metaObject.getValue("boundSql");
+            BoundSql boundSql = (BoundSql) metaObject.getValue(MybatisFieldNameCons.BOUND_SQL);
             List<FieldEncryptSnapshotBo> infos = (List<FieldEncryptSnapshotBo>) boundSql.getAdditionalParameter(
                 FieldEncryptBeforeInterceptor.class
                     .getName().replace(".", "-"));

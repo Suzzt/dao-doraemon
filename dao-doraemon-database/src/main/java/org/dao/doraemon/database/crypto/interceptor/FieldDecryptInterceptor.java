@@ -19,6 +19,7 @@ import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import org.dao.doraemon.database.crypto.annotated.Decrypt;
+import org.dao.doraemon.database.crypto.constant.MybatisFieldNameCons;
 import org.dao.doraemon.database.crypto.server.DecryptServer;
 import org.dao.doraemon.database.crypto.util.FieldReflectorUtil;
 
@@ -36,7 +37,7 @@ public class FieldDecryptInterceptor implements Interceptor {
         ResultSetHandler resultSetHandler = (ResultSetHandler) invocation.getTarget();
         MetaObject metaObject = MetaObject.forObject(resultSetHandler, OBJECT_FACTORY, OBJECT_WRAPPER_FACTORY,
             REFLECTOR_FACTORY);
-        MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("mappedStatement");
+        MappedStatement mappedStatement = (MappedStatement) metaObject.getValue(MybatisFieldNameCons.MAPPED_STATEMENT);
         SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
         // 只处理dml语句
         if (SqlCommandType.SELECT == sqlCommandType) {
