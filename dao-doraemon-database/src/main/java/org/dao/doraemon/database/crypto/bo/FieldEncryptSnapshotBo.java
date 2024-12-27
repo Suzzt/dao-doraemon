@@ -1,4 +1,4 @@
-package org.dao.doraemon.database.crypto;
+package org.dao.doraemon.database.crypto.bo;
 
 import java.lang.reflect.Field;
 
@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
  * @author wuzhenhong
  * @date 2024/12/20 10:38
  */
-public class FieldEncryptSnapshotInfo {
+public class FieldEncryptSnapshotBo {
 
     private Object containBean;
     private Field field;

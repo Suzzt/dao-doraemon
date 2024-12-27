@@ -1,4 +1,4 @@
-package org.dao.doraemon.database.crypto;
+package org.dao.doraemon.database.crypto.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

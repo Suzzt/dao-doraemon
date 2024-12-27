@@ -1,4 +1,4 @@
-package org.dao.doraemon.database.crypto;
+package org.dao.doraemon.database.crypto.interceptor;
 
 import java.lang.reflect.Field;
 import java.sql.Statement;
@@ -18,6 +18,7 @@ import org.apache.ibatis.reflection.ReflectorFactory;
 import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
+import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshotBo;
 
 @Intercepts({@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {
     Statement.class})})
@@ -39,10 +40,10 @@ public class FieldEncryptAfterInterceptor implements Interceptor {
         if (SqlCommandType.INSERT == sqlCommandType ||
             SqlCommandType.UPDATE == sqlCommandType) {
             BoundSql boundSql = (BoundSql) metaObject.getValue("boundSql");
-            List<FieldEncryptSnapshotInfo> infos = (List<FieldEncryptSnapshotInfo>) boundSql.getAdditionalParameter(
+            List<FieldEncryptSnapshotBo> infos = (List<FieldEncryptSnapshotBo>) boundSql.getAdditionalParameter(
                 FieldEncryptBeforeInterceptor.class
                     .getName().replace(".", "-"));
-            if(Objects.nonNull(infos) && !infos.isEmpty()) {
+            if (Objects.nonNull(infos) && !infos.isEmpty()) {
                 infos.stream().forEach(info -> {
                     Field field = info.getField();
                     field.setAccessible(true);

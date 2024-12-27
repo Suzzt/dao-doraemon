@@ -1,9 +1,7 @@
-package org.dao.doraemon.database.crypto;
+package org.dao.doraemon.database.crypto.interceptor;
 
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import java.sql.Statement;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -20,6 +18,9 @@ import org.apache.ibatis.reflection.ReflectorFactory;
 import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
+import org.dao.doraemon.database.crypto.annotated.Decrypt;
+import org.dao.doraemon.database.crypto.server.DecryptServer;
+import org.dao.doraemon.database.crypto.util.FieldReflectorUtil;
 
 @Intercepts({@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {
     Statement.class})})
@@ -88,40 +89,34 @@ public class FieldDecryptInterceptor implements Interceptor {
                 this.doGetDecryptVal(item, null);
             }
         } else if (Iterable.class.isAssignableFrom(clazz)) {
-            Iterable c = (Iterable) fieldBean;
+            Iterable<?> c = (Iterable<?>) fieldBean;
             for (Object item : c) {
                 this.doGetDecryptVal(item, null);
             }
         } else if (Map.class.isAssignableFrom(clazz)) {
-            Map map = (Map) fieldBean;
+            Map<?, ?> map = (Map<?, ?>) fieldBean;
             map.values().stream().forEach(item -> {
                 this.doGetDecryptVal(item, null);
             });
         } else if (String.class.isAssignableFrom(clazz)) {
-            boolean decrypt = this.isDecrypt(field);
-            return this.decryptNess((String) fieldBean, decrypt);
+            return this.decryptNess((String) fieldBean, field);
         } else {
             this.process(fieldBean);
         }
         return fieldBean;
     }
 
-    private Object decryptNess(String fieldBean, boolean decrypt) {
-        if (!decrypt) {
+    private Object decryptNess(String fieldBean, Field field) {
+        if (Objects.isNull(fieldBean) || Objects.isNull(field)) {
             return fieldBean;
         }
-        String decryptedValue =
-            String.valueOf(Base64.getDecoder().decode(fieldBean.getBytes(StandardCharsets.UTF_8)));
+        Decrypt deCryptoAnnotation = field.getAnnotation(Decrypt.class);
+        if (Objects.isNull(deCryptoAnnotation)) {
+            return fieldBean;
+        }
+        Class<DecryptServer> decryptServerClass = deCryptoAnnotation.decrypt();
+        DecryptServer decryptServer = OBJECT_FACTORY.create(decryptServerClass);
+        String decryptedValue = decryptServer.decrypt(fieldBean);
         return decryptedValue;
     }
-
-    private boolean isDecrypt(Field field) {
-        if (Objects.isNull(field)) {
-            return false;
-        }
-        Crypto cryptoAnnotation = field.getAnnotation(Crypto.class);
-        return Objects.nonNull(cryptoAnnotation);
-    }
-
-
 }

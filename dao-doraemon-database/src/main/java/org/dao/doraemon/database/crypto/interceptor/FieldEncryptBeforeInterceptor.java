@@ -1,10 +1,8 @@
-package org.dao.doraemon.database.crypto;
+package org.dao.doraemon.database.crypto.interceptor;
 
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -22,6 +20,11 @@ import org.apache.ibatis.reflection.ReflectorFactory;
 import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
+import org.dao.doraemon.database.crypto.annotated.Crypto;
+import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshotBo;
+import org.dao.doraemon.database.crypto.server.CryptoServer;
+import org.dao.doraemon.database.crypto.util.FieldReflectorUtil;
+import org.dao.doraemon.database.crypto.util.ThreadLocalUtil;
 
 @Intercepts({@Signature(type = ParameterHandler.class, method = "setParameters", args = {
     PreparedStatement.class})})
@@ -45,7 +48,7 @@ public class FieldEncryptBeforeInterceptor implements Interceptor {
             Object parameter = parameterHandler.getParameterObject();
             try {
                 this.execEncrypt(parameter);
-                List<FieldEncryptSnapshotInfo> infos = ThreadLocalUtil.get();
+                List<FieldEncryptSnapshotBo> infos = ThreadLocalUtil.get();
                 if (Objects.nonNull(infos)) {
                     boundSql.setAdditionalParameter(FieldEncryptBeforeInterceptor.class
                         .getName().replace(".", "-"), infos);
@@ -62,7 +65,7 @@ public class FieldEncryptBeforeInterceptor implements Interceptor {
             return;
         }
         if (parameter instanceof Map) {
-            Map map = (Map) parameter;
+            Map<?, ?> map = (Map<?, ?>) parameter;
             List<Object> itemRepeatList = new ArrayList<>();
             map.values().forEach(item -> {
                 for (Object repeat : itemRepeatList) {
@@ -125,35 +128,40 @@ public class FieldEncryptBeforeInterceptor implements Interceptor {
                 this.doGetEncryptVal(item, null);
             }
         } else if (Iterable.class.isAssignableFrom(clazz)) {
-            Iterable c = (Iterable) fieldBean;
+            Iterable<?> c = (Iterable<?>) fieldBean;
             for (Object item : c) {
                 this.doGetEncryptVal(item, null);
             }
         } else if (Map.class.isAssignableFrom(clazz)) {
-            Map map = (Map) fieldBean;
+            Map<?, ?> map = (Map<?, ?>) fieldBean;
             map.values().stream().forEach(item -> {
                 this.doGetEncryptVal(item, null);
             });
         } else if (String.class.isAssignableFrom(clazz)) {
-            boolean encrypt = this.isEncrypt(field);
-            return this.encryptNess(field, (String) fieldBean, encrypt, containBean);
+            return this.encryptNess((String) fieldBean, field, containBean);
         } else {
             this.process(fieldBean);
         }
         return fieldBean;
     }
 
-    private Object encryptNess(Field field, String fieldBean, boolean encrypt, Object containBean) {
-        if (!encrypt) {
+    private Object encryptNess(String fieldBean, Field field, Object containBean) {
+        if (Objects.isNull(fieldBean) || Objects.isNull(field)) {
             return fieldBean;
         }
-        String encryptedValue = Base64.getEncoder().encodeToString(fieldBean.getBytes(StandardCharsets.UTF_8));
-        List<FieldEncryptSnapshotInfo> infos = ThreadLocalUtil.get();
-        if(Objects.isNull(infos)) {
+        Crypto cryptoAnnotation = field.getAnnotation(Crypto.class);
+        if (Objects.isNull(cryptoAnnotation)) {
+            return fieldBean;
+        }
+        Class<CryptoServer> cryptoServerClass = cryptoAnnotation.crypto();
+        CryptoServer cryptoServer = OBJECT_FACTORY.create(cryptoServerClass);
+        String encryptedValue = cryptoServer.crypto(fieldBean);
+        List<FieldEncryptSnapshotBo> infos = ThreadLocalUtil.get();
+        if (Objects.isNull(infos)) {
             infos = new ArrayList<>();
             ThreadLocalUtil.set(infos);
         }
-        FieldEncryptSnapshotInfo info = new FieldEncryptSnapshotInfo();
+        FieldEncryptSnapshotBo info = new FieldEncryptSnapshotBo();
         info.setContainBean(containBean);
         info.setOrigin(fieldBean);
         info.setEncrypt(encryptedValue);
@@ -161,14 +169,4 @@ public class FieldEncryptBeforeInterceptor implements Interceptor {
         infos.add(info);
         return encryptedValue;
     }
-
-    private boolean isEncrypt(Field field) {
-        if (Objects.isNull(field)) {
-            return false;
-        }
-        Crypto cryptoAnnotation = field.getAnnotation(Crypto.class);
-        return Objects.nonNull(cryptoAnnotation);
-    }
-
-
 }
