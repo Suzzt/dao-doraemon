@@ -8,10 +8,21 @@ import java.lang.reflect.Field;
  */
 public class FieldEncryptSnapshotBo {
 
+    /**
+     * 加密字段所属的主对象
+     */
     private Object containBean;
+    /**
+     * 加密字段信息
+     */
     private Field field;
-
+    /**
+     * 加密字段未加密时的值
+     */
     private Object origin;
+    /**
+     * 加密后的值
+     */
     private Object encrypt;
 
     public Field getField() {

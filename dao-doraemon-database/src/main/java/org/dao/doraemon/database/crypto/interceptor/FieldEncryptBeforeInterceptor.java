@@ -28,6 +28,7 @@ import org.dao.doraemon.database.crypto.util.FieldReflectorUtil;
 import org.dao.doraemon.database.crypto.util.ThreadLocalUtil;
 
 /**
+ * insert与update时对数据加密
  * @author wuzhenhong
  * @date 2024/12/27 9:48
  */

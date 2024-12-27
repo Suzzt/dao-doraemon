@@ -22,6 +22,7 @@ import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshotBo;
 import org.dao.doraemon.database.crypto.constant.MybatisFieldNameCons;
 
 /**
+ * 加密保存到数据库之后，有些业务会复用保存前的对象，此时需要将原来的数据还原
  * @author wuzhenhong
  * @date 2024/12/27 9:48
  */

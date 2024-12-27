@@ -32,6 +32,7 @@
         <gson-version>2.8.5</gson-version>
         <slf4j-version>1.7.21</slf4j-version>
         <logback-version>1.2.3</logback-version>
+        <mybatis-version>3.5.7</mybatis-version>
     </properties>
 
     <parent>
@@ -39,6 +40,17 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.4.2</version>
     </parent>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis-version}</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
