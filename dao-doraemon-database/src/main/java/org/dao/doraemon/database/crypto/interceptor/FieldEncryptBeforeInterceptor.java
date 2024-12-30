@@ -10,41 +10,31 @@ import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
-import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.ReflectorFactory;
-import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
-import org.apache.ibatis.reflection.factory.ObjectFactory;
-import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
-import org.dao.doraemon.database.crypto.annotated.Crypto;
+import org.dao.doraemon.database.crypto.annotated.Encrypt;
 import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshotBo;
 import org.dao.doraemon.database.crypto.constant.MybatisFieldNameCons;
-import org.dao.doraemon.database.crypto.server.CryptoServer;
+import org.dao.doraemon.database.crypto.server.EncryptService;
 import org.dao.doraemon.database.crypto.util.FieldReflectorUtil;
 import org.dao.doraemon.database.crypto.util.ThreadLocalUtil;
 
 /**
  * insert与update时对数据加密
+ *
  * @author wuzhenhong
- * @date 2024/12/27 9:48
+ * @date 2024/12/30 8:28
  */
 @Intercepts({@Signature(type = ParameterHandler.class, method = "setParameters", args = {
     PreparedStatement.class})})
-public class FieldEncryptBeforeInterceptor implements Interceptor {
-
-    private static final ObjectFactory OBJECT_FACTORY = new DefaultObjectFactory();
-    private static final org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
-    private static final ReflectorFactory REFLECTOR_FACTORY = new DefaultReflectorFactory();
+public class FieldEncryptBeforeInterceptor extends AbstractInterceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         ParameterHandler parameterHandler = (ParameterHandler) invocation.getTarget();
-        MetaObject metaObject = MetaObject.forObject(parameterHandler, OBJECT_FACTORY, OBJECT_WRAPPER_FACTORY,
-            REFLECTOR_FACTORY);
+        MetaObject metaObject = super.forObject(parameterHandler);
         MappedStatement mappedStatement = (MappedStatement) metaObject.getValue(MybatisFieldNameCons.MAPPED_STATEMENT);
         SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
         // 只处理dml语句
@@ -155,13 +145,13 @@ public class FieldEncryptBeforeInterceptor implements Interceptor {
         if (Objects.isNull(fieldBean) || Objects.isNull(field)) {
             return fieldBean;
         }
-        Crypto cryptoAnnotation = field.getAnnotation(Crypto.class);
-        if (Objects.isNull(cryptoAnnotation)) {
+        Encrypt encryptAnnotation = field.getAnnotation(Encrypt.class);
+        if (Objects.isNull(encryptAnnotation)) {
             return fieldBean;
         }
-        Class<CryptoServer> cryptoServerClass = cryptoAnnotation.crypto();
-        CryptoServer cryptoServer = OBJECT_FACTORY.create(cryptoServerClass);
-        String encryptedValue = cryptoServer.crypto(fieldBean);
+        Class<EncryptService> cryptoServerClass = encryptAnnotation.encrypt();
+        EncryptService encryptService = super.getByCache(cryptoServerClass);
+        String encryptedValue = encryptService.encrypt(fieldBean);
         List<FieldEncryptSnapshotBo> infos = ThreadLocalUtil.get();
         if (Objects.isNull(infos)) {
             infos = new ArrayList<>();

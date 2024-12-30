@@ -28,6 +28,11 @@
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
         </dependency>
+        <dependency>
+            <artifactId>spring-boot-starter</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>
