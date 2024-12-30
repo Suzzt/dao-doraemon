@@ -1,4 +1,4 @@
-package org.dao.doraemon.example.crypto.spring.starter;
+package org.dao.doraemon.database.crypto.spring.starter;
 
 import java.util.Map;
 import java.util.Objects;
