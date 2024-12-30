@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  org.dao.doraemon.database.crypto.spring.starter.AutoMybatisInterceptorSpringConfig
