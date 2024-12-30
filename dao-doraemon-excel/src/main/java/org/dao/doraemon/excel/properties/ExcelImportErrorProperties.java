@@ -13,7 +13,7 @@ public class ExcelImportErrorProperties {
     /**
      * 是否需要返回生成错误文件信息
      */
-    private Boolean isMake;
+    private Boolean isGenerateErrorFile = false;
 
     /**
      * 指定生成错误列的名称
@@ -23,5 +23,5 @@ public class ExcelImportErrorProperties {
     /**
      * 根据链接下载错误文件名
      */
-    private String errorFileName = "ExcelFailedReport";
+    private String errorFileName = "ExcelFailedReport.xlsx";
 }

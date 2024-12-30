@@ -32,6 +32,11 @@ public class ExcelImportProperties {
     private Integer batchProcessRows = 1;
 
     /**
+     * 指定跳过的行
+     */
+    private int[] skipRow;
+
+    /**
      * 定义错误提示文件信息
      */
     private ExcelImportErrorProperties excelImportErrorProperties;

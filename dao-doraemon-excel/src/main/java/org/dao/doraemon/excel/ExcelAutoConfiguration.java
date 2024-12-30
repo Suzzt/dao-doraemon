@@ -1,8 +1,12 @@
 package org.dao.doraemon.excel;
 
+import org.dao.doraemon.excel.imported.Dispatcher;
 import org.dao.doraemon.excel.server.ExcelHttpServer;
+import org.dao.doraemon.excel.storage.ExcelStorageProcessor;
+import org.dao.doraemon.excel.storage.LocalExcelStorageProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * Auto-Configuration for Excel.
@@ -18,10 +22,15 @@ import org.springframework.context.annotation.Configuration;
  * @see ExcelHttpServer
  */
 @Configuration
+@Import(Dispatcher.class)
 public class ExcelAutoConfiguration {
     @Bean
-    public ExcelHttpServer excelHttpServer() {
-        return new ExcelHttpServer();
+    public ExcelHttpServer excelHttpServer(Dispatcher dispatcher) {
+        return new ExcelHttpServer(dispatcher);
     }
 
+    @Bean
+    public ExcelStorageProcessor excelStorageProcessor() {
+        return new LocalExcelStorageProcessor();
+    }
 }
