@@ -1,7 +1,6 @@
 package org.dao.doraemon.example.excel;
 
 import com.alibaba.excel.context.AnalysisContext;
-import com.alibaba.excel.metadata.data.ReadCellData;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.dao.doraemon.excel.annotation.ErrorImportConfiguration;
@@ -48,8 +47,11 @@ public class DemoBizExcelImportHandler extends AbstractDefaultImportHandler<User
         if(data.getAge()==null){
             return ImportResultModel.success();
         }
-        if(data.getAge()%2 ==1){
-            return ImportResultModel.fail("error data");
+
+        if(data.getAge()%3 ==1){
+            return ImportResultModel.fail("error data==error data==error data==error data==error data==error data==");
+        }else if(data.getAge()%3 ==2){
+            return ImportResultModel.fail("error");
         }
         return ImportResultModel.success();
     }

@@ -1,10 +1,7 @@
 package org.dao.doraemon.excel.imported;
 
+import cn.hutool.core.lang.Snowflake;
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.write.handler.AbstractRowWriteHandler;
-import com.alibaba.excel.write.handler.context.RowWriteHandlerContext;
-import com.alibaba.excel.write.metadata.style.WriteCellStyle;
-import com.alibaba.excel.write.metadata.style.WriteFont;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dao.doraemon.excel.annotation.ErrorImportConfiguration;
@@ -95,75 +92,105 @@ public class Dispatcher implements BeanPostProcessor {
         ExcelImportProperties excelProperties = excelImportWrapper.getExcelImportProperties();
         ImportHandler<?> importHandler = excelImportWrapper.getImportHandler();
         Class<?> bizClazz = GenericTypeResolver.getGenericType(importHandler.getClass());
-        ExcelProcessListener<?> readListener = new ExcelProcessListener<>(importHandler, excelImportWrapper.getExcelImportProperties(), parameter);
-        // todo 先支持第一个 sheet 吧
-        EasyExcel.read(inputStream, bizClazz, readListener).headRowNumber(excelProperties.getHeadRow()).sheet().doRead();
+        ExcelProcessListener<?> readListener = new ExcelProcessListener<>(importHandler, excelProperties, parameter);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try {
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, len);
+            }
+        } finally {
+            inputStream.close();
+        }
+
+        // 转为可重复使用的流
+        byte[] excelData = byteArrayOutputStream.toByteArray();
+        InputStream reusableInputStream1 = new ByteArrayInputStream(excelData);
+        InputStream reusableInputStream2 = new ByteArrayInputStream(excelData);
 
         ExcelImportResult result = new ExcelImportResult();
-        Map<Integer, String> failCollector = readListener.getFailCollector();
-        int totalCount = readListener.getTotalRows();
-        int failCount = failCollector.size();
-        int skipCount = readListener.getSkipRows();
-        result.setTotalCount(totalCount);
-        result.setFailCount(failCount);
-        result.setSuccessCount(totalCount - failCount);
-        result.setSkipCount(skipCount);
 
-        ExcelImportErrorProperties errorProperties = excelProperties.getExcelImportErrorProperties();
-        if (failCount != 0 && errorProperties.getIsGenerateErrorFile()) {
-            // 原文件数据
-            Workbook workbook = new XSSFWorkbook(inputStream);
-            Sheet sheet = workbook.getSheetAt(0);
+        try {
+            // 使用 EasyExcel 读取数据
+            EasyExcel.read(reusableInputStream1, bizClazz, readListener).headRowNumber(excelProperties.getHeadRow()).sheet().doRead();
 
-            // 生成错误的表头信息 追加到原有文件指定表头行的排序后最后一列
-            int headRow = excelProperties.getHeadRow();
-            Row row = sheet.getRow(headRow);
-            int headColumn = row == null ? 0 : row.getLastCellNum();
-            importHandler.generateErrorHeadStyle(workbook, sheet, headRow, headColumn, errorProperties.getErrorColumnName(), parameter);
+            // 收集读取结果
+            Map<Integer, String> failCollector = readListener.getFailCollector();
+            int totalCount = readListener.getTotalRows();
+            int failCount = failCollector.size();
+            int skipCount = readListener.getSkipRows();
+            result.setTotalCount(totalCount);
+            result.setFailCount(failCount);
+            result.setSuccessCount(totalCount - failCount);
+            result.setSkipCount(skipCount);
 
-            // 将处理失败的信息填充到原文件最后一列
-            for (Map.Entry<Integer, String> entry : failCollector.entrySet()) {
-                Integer failRow = entry.getKey();
-                String failMessage = entry.getValue();
+            // 如果需要生成错误文件
+            ExcelImportErrorProperties errorProperties = excelProperties.getExcelImportErrorProperties();
+            if (failCount != 0 && errorProperties.getIsGenerateErrorFile()) {
+                try (Workbook workbook = new XSSFWorkbook(reusableInputStream2)) {
+                    Sheet sheet = workbook.getSheetAt(0);
 
-                Row failDataRow = sheet.getRow(failRow);
-                if (failDataRow == null) {
-                    failDataRow = sheet.createRow(failRow);
-                }
+                    // 生成错误的表头信息追加到原有文件最后一列
+                    int headRow = excelProperties.getHeadRow() - 1;
+                    Row row = sheet.getRow(headRow);
+                    int headColumn = row == null ? 0 : row.getLastCellNum();
+                    importHandler.generateErrorHeadStyle(workbook, sheet, headRow, headColumn, errorProperties.getErrorColumnName(), parameter);
 
-                // 确定写入错误信息的列索引（最后一列+1）
-                Cell errorCell = failDataRow.getCell(headColumn);
-                if (errorCell == null) {
-                    errorCell = failDataRow.createCell(headColumn);
-                }
+                    // 填充错误信息
+                    for (Map.Entry<Integer, String> entry : failCollector.entrySet()) {
+                        Integer failRow = entry.getKey();
+                        String failMessage = entry.getValue();
 
-                // 获取最后一列（即错误列前一列）的样式
-                CellStyle previousCellStyle = null;
-                if (headColumn > 0) {
-                    Cell previousCell = failDataRow.getCell(headColumn - 1);
-                    if (previousCell != null) {
-                        previousCellStyle = previousCell.getCellStyle();
+                        Row failDataRow = sheet.getRow(failRow);
+                        if (failDataRow == null) {
+                            failDataRow = sheet.createRow(failRow);
+                        }
+
+                        // 确定写入错误信息的列索引
+                        Cell errorCell = failDataRow.getCell(headColumn);
+                        if (errorCell == null) {
+                            errorCell = failDataRow.createCell(headColumn);
+                        }
+
+                        // 获取前一列的样式
+                        CellStyle previousCellStyle = null;
+                        if (headColumn > 0) {
+                            Cell previousCell = failDataRow.getCell(headColumn - 1);
+                            if (previousCell != null) {
+                                previousCellStyle = previousCell.getCellStyle();
+                            }
+                        }
+
+                        // 复制样式到错误列
+                        if (previousCellStyle != null) {
+                            errorCell.setCellStyle(previousCellStyle);
+                        }
+
+                        // 写入错误信息
+                        errorCell.setCellValue(failMessage);
                     }
-                }
-
-                // 复制样式到错误信息列
-                if (previousCellStyle != null) {
-                    errorCell.setCellStyle(previousCellStyle);
-                }
-
-                // 写入错误信息
-                errorCell.setCellValue(failMessage);
-
-                try (FileOutputStream fileOutputStream = new FileOutputStream("/Users/sucf/Downloads/00000.xlsx")) {
-                    workbook.write(fileOutputStream);
-                } catch (IOException e) {
-                    throw new RuntimeException("Failed to write workbook to file", e);
-                } finally {
-                    // 确保关闭 Workbook 以释放资源
-                    workbook.close();
+                    String downloadUrl = storageProcessor.submit(new Snowflake(1, 1).nextId() + File.separator + errorProperties.getErrorFileName(), workbook);
+                    result.setFailDownloadAddress(downloadUrl);
                 }
             }
+        } finally {
+            reusableInputStream1.close();
+            reusableInputStream2.close();
+            byteArrayOutputStream.close();
         }
+
         return result;
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param path 文件路径
+     * @return excel 文件流
+     */
+    public InputStream download(String path) {
+        return storageProcessor.download(path);
     }
 }
