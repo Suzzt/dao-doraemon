@@ -38,7 +38,6 @@ public class LocalExcelStorageProcessor implements ExcelStorageProcessor {
 
     @Override
     public void delete(String path) {
-
     }
 
     @Override

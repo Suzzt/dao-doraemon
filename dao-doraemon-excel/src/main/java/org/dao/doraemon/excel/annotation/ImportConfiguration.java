@@ -1,7 +1,6 @@
 package org.dao.doraemon.excel.annotation;
 
 import java.lang.annotation.*;
-import java.util.List;
 
 /**
  * 配置导入属性
@@ -21,7 +20,7 @@ public @interface ImportConfiguration {
     /**
      * 表头所在行数(默认从第2行作为表头)
      */
-    int headRow() default 2;
+    int headRow() default 5;
 
     /**
      * 是否校验表头

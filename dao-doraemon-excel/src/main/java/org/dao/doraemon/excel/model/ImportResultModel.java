@@ -11,6 +11,11 @@ import lombok.Data;
 @Data
 public class ImportResultModel {
     private String message;
+    /**
+     * 0:success
+     * -1:fail
+     * 1:skip
+     */
     private Integer status;
 
     /**

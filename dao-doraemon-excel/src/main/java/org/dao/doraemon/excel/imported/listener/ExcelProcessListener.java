@@ -2,14 +2,15 @@ package org.dao.doraemon.excel.imported.listener;
 
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
-import com.alibaba.excel.metadata.data.ReadCellData;
 import lombok.Getter;
-import org.dao.doraemon.excel.imported.handler.AbstractDefaultImportHandler;
+import org.dao.doraemon.excel.exception.ExcelHeaderMismatchException;
+import org.dao.doraemon.excel.imported.handler.ImportHandler;
 import org.dao.doraemon.excel.model.ImportResultModel;
 import org.dao.doraemon.excel.properties.ExcelImportProperties;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Excel处理监听
@@ -19,13 +20,13 @@ import java.util.Map;
  */
 public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
 
-    private final AbstractDefaultImportHandler<T> handler;
+    private final ImportHandler<T> handler;
 
     private final ExcelImportProperties excelImportProperties;
 
     private final String requestParameter;
 
-    public ExcelProcessListener(AbstractDefaultImportHandler<T> handler, ExcelImportProperties excelImportProperties, String requestParameter) {
+    public ExcelProcessListener(ImportHandler<T> handler, ExcelImportProperties excelImportProperties, String requestParameter) {
         this.handler = handler;
         this.excelImportProperties = excelImportProperties;
         this.requestParameter = requestParameter;
@@ -50,22 +51,22 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
     private int skipRows = 0;
 
     @Override
-    public void invoke(T t, AnalysisContext context) {
+    public void invoke(T data, AnalysisContext context) {
+        Integer rowIndex = context.readRowHolder().getRowIndex();
         totalRows++;
         // todo 这里可以用bitMap来优化
         int[] skipRow = excelImportProperties.getSkipRow();
         for (int i : skipRow) {
-            Integer rowIndex = context.readRowHolder().getRowIndex();
             if (i == rowIndex) {
                 skipRows++;
                 return;
             }
         }
 
-        ImportResultModel result = handler.process(t, requestParameter, context);
+        ImportResultModel result = handler.process(data, requestParameter, context);
         if (result.getStatus() != 0) {
             if (result.getStatus() == -1) {
-                failCollector.put(context.readRowHolder().getRowIndex(), result.getMessage());
+                failCollector.put(rowIndex, result.getMessage());
             } else {
                 skipRows++;
             }
@@ -77,10 +78,13 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
     }
 
     @Override
-    public void invokeHead(Map<Integer, ReadCellData<?>> headMap, AnalysisContext context) {
-        ImportResultModel headResult = handler.checkHead(headMap, requestParameter);
-        if (headResult.getStatus() == -1) {
-            throw new RuntimeException(headResult.getMessage());
+    public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
+        Integer rowIndex = context.readRowHolder().getRowIndex();
+        if (excelImportProperties.getIsCheckHand() && Objects.equals(rowIndex, excelImportProperties.getHeadRow())) {
+            ImportResultModel headResult = handler.checkHead(headMap, requestParameter);
+            if (headResult.getStatus() == -1) {
+                throw new ExcelHeaderMismatchException(headResult.getMessage(), "期望值", "实际值");
+            }
         }
     }
 }

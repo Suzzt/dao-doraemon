@@ -1,7 +1,7 @@
 package org.dao.doraemon.excel.wrapper;
 
 import lombok.Data;
-import org.dao.doraemon.excel.imported.handler.AbstractDefaultImportHandler;
+import org.dao.doraemon.excel.imported.handler.ImportHandler;
 import org.dao.doraemon.excel.properties.ExcelImportProperties;
 
 /**
@@ -13,5 +13,5 @@ import org.dao.doraemon.excel.properties.ExcelImportProperties;
 @Data
 public class ExcelImportWrapper {
     private ExcelImportProperties excelImportProperties;
-    private AbstractDefaultImportHandler<?> abstractDefaultImportHandler;
+    private ImportHandler<?> importHandler;
 }

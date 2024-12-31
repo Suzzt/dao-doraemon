@@ -21,6 +21,11 @@ public class ExcelImportResult {
     private Integer successCount;
 
     /**
+     * 跳过总数量
+     */
+    private Integer skipCount;
+
+    /**
      * 导入内容总数(去掉跳过数量+从表头后开始计算)
      */
     private Integer totalCount;

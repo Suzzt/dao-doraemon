@@ -1,10 +1,17 @@
 package org.dao.doraemon.excel.imported;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.handler.AbstractRowWriteHandler;
+import com.alibaba.excel.write.handler.context.RowWriteHandlerContext;
+import com.alibaba.excel.write.metadata.style.WriteCellStyle;
+import com.alibaba.excel.write.metadata.style.WriteFont;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dao.doraemon.excel.annotation.ErrorImportConfiguration;
 import org.dao.doraemon.excel.annotation.ExcelImport;
 import org.dao.doraemon.excel.annotation.ImportConfiguration;
 import org.dao.doraemon.excel.imported.handler.AbstractDefaultImportHandler;
+import org.dao.doraemon.excel.imported.handler.ImportHandler;
 import org.dao.doraemon.excel.imported.listener.ExcelProcessListener;
 import org.dao.doraemon.excel.imported.resolver.GenericTypeResolver;
 import org.dao.doraemon.excel.properties.ExcelImportErrorProperties;
@@ -14,9 +21,9 @@ import org.dao.doraemon.excel.storage.ExcelStorageProcessor;
 import org.dao.doraemon.excel.wrapper.ExcelImportWrapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
+import org.springframework.util.Assert;
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +60,7 @@ public class Dispatcher implements BeanPostProcessor {
         return BeanPostProcessor.super.postProcessBeforeInitialization(bean, beanName);
     }
 
-    private static ExcelImportWrapper getExcelImportWrapper(ExcelImport annotation, AbstractDefaultImportHandler<?> abstractDefaultImportHandler) {
+    private static ExcelImportWrapper getExcelImportWrapper(ExcelImport annotation, ImportHandler<?> importHandler) {
         ImportConfiguration configuration = annotation.configuration();
         ErrorImportConfiguration errorImportConfiguration = configuration.errorImport();
         ExcelImportProperties properties = new ExcelImportProperties();
@@ -70,7 +77,7 @@ public class Dispatcher implements BeanPostProcessor {
 
         ExcelImportWrapper excelImportWrapper = new ExcelImportWrapper();
         excelImportWrapper.setExcelImportProperties(properties);
-        excelImportWrapper.setAbstractDefaultImportHandler(abstractDefaultImportHandler);
+        excelImportWrapper.setImportHandler(importHandler);
         return excelImportWrapper;
     }
 
@@ -78,27 +85,84 @@ public class Dispatcher implements BeanPostProcessor {
      * excel 导入数据处理
      *
      * @param code
-     * @param param
+     * @param parameter
      * @param inputStream
      * @return
      */
-    public ExcelImportResult execute(String code, String param, InputStream inputStream) {
+    public ExcelImportResult execute(String code, String parameter, InputStream inputStream) throws IOException {
         ExcelImportWrapper excelImportWrapper = resource.get(code);
-        AbstractDefaultImportHandler<?> abstractDefaultImportHandler = excelImportWrapper.getAbstractDefaultImportHandler();
-        Class<?> bizClazz = GenericTypeResolver.getGenericType(abstractDefaultImportHandler.getClass());
-        ExcelProcessListener<?> readListener = new ExcelProcessListener<>(abstractDefaultImportHandler, excelImportWrapper.getExcelImportProperties(), param);
-        EasyExcel.read(inputStream, bizClazz, readListener).sheet().doRead();
+        Assert.notNull(excelImportWrapper, "not fond excel handler, check you code.");
+        ExcelImportProperties excelProperties = excelImportWrapper.getExcelImportProperties();
+        ImportHandler<?> importHandler = excelImportWrapper.getImportHandler();
+        Class<?> bizClazz = GenericTypeResolver.getGenericType(importHandler.getClass());
+        ExcelProcessListener<?> readListener = new ExcelProcessListener<>(importHandler, excelImportWrapper.getExcelImportProperties(), parameter);
+        // todo 先支持第一个 sheet 吧
+        EasyExcel.read(inputStream, bizClazz, readListener).headRowNumber(excelProperties.getHeadRow()).sheet().doRead();
+
+        ExcelImportResult result = new ExcelImportResult();
         Map<Integer, String> failCollector = readListener.getFailCollector();
         int totalCount = readListener.getTotalRows();
-        // build result
-        ExcelImportResult result = new ExcelImportResult();
         int failCount = failCollector.size();
+        int skipCount = readListener.getSkipRows();
         result.setTotalCount(totalCount);
         result.setFailCount(failCount);
         result.setSuccessCount(totalCount - failCount);
-        if (failCount != 0) {
-            // todo 构建错误文件
-            result.setFailDownloadAddress("http://localhost:8080/download/fail" + code + ".xlsx");
+        result.setSkipCount(skipCount);
+
+        ExcelImportErrorProperties errorProperties = excelProperties.getExcelImportErrorProperties();
+        if (failCount != 0 && errorProperties.getIsGenerateErrorFile()) {
+            // 原文件数据
+            Workbook workbook = new XSSFWorkbook(inputStream);
+            Sheet sheet = workbook.getSheetAt(0);
+
+            // 生成错误的表头信息 追加到原有文件指定表头行的排序后最后一列
+            int headRow = excelProperties.getHeadRow();
+            Row row = sheet.getRow(headRow);
+            int headColumn = row == null ? 0 : row.getLastCellNum();
+            importHandler.generateErrorHeadStyle(workbook, sheet, headRow, headColumn, errorProperties.getErrorColumnName(), parameter);
+
+            // 将处理失败的信息填充到原文件最后一列
+            for (Map.Entry<Integer, String> entry : failCollector.entrySet()) {
+                Integer failRow = entry.getKey();
+                String failMessage = entry.getValue();
+
+                Row failDataRow = sheet.getRow(failRow);
+                if (failDataRow == null) {
+                    failDataRow = sheet.createRow(failRow);
+                }
+
+                // 确定写入错误信息的列索引（最后一列+1）
+                Cell errorCell = failDataRow.getCell(headColumn);
+                if (errorCell == null) {
+                    errorCell = failDataRow.createCell(headColumn);
+                }
+
+                // 获取最后一列（即错误列前一列）的样式
+                CellStyle previousCellStyle = null;
+                if (headColumn > 0) {
+                    Cell previousCell = failDataRow.getCell(headColumn - 1);
+                    if (previousCell != null) {
+                        previousCellStyle = previousCell.getCellStyle();
+                    }
+                }
+
+                // 复制样式到错误信息列
+                if (previousCellStyle != null) {
+                    errorCell.setCellStyle(previousCellStyle);
+                }
+
+                // 写入错误信息
+                errorCell.setCellValue(failMessage);
+
+                try (FileOutputStream fileOutputStream = new FileOutputStream("/Users/sucf/Downloads/00000.xlsx")) {
+                    workbook.write(fileOutputStream);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to write workbook to file", e);
+                } finally {
+                    // 确保关闭 Workbook 以释放资源
+                    workbook.close();
+                }
+            }
         }
         return result;
     }

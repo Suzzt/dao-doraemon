@@ -11,12 +11,15 @@ import lombok.Data;
  */
 @Data
 public class UserEntity {
-    @ExcelProperty("姓名")
+//    @ExcelProperty("姓名")
+    @ExcelProperty(index = 0)
     private String name;
 
-    @ExcelProperty("年龄")
+//    @ExcelProperty("年龄")
+@ExcelProperty(index = 1)
     private Integer age;
 
-    @ExcelProperty("邮箱")
+//    @ExcelProperty("邮箱")
+@ExcelProperty(index = 2)
     private String email;
 }

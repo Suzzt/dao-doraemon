@@ -2,6 +2,8 @@ package org.dao.doraemon.excel.imported.handler;
 
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.metadata.data.ReadCellData;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.dao.doraemon.excel.model.ImportResultModel;
 import org.dao.doraemon.excel.properties.ExcelImportProperties;
 
@@ -22,7 +24,7 @@ public interface ImportHandler<T> {
      * @param requestParameter 请求参数
      * @return 处理结果定义
      */
-    ImportResultModel checkHead(Map<Integer, ReadCellData<?>> headMap, String requestParameter);
+    ImportResultModel checkHead(Map<Integer, String> headMap, String requestParameter);
 
     /**
      * 处理你的业务
@@ -41,4 +43,17 @@ public interface ImportHandler<T> {
      * @return 下载时的文件名
      */
     String defineFailFileName(ExcelImportProperties excelImportProperties);
+
+
+    /**
+     * 构建错误表头样式
+     *
+     * @param workbook   workbook
+     * @param sheet      sheet
+     * @param headRow    表头生成所在行
+     * @param headColumn 表头生成所在列
+     * @param headTitle  表头名称
+     * @param parameter  请求参数
+     */
+    void generateErrorHeadStyle(Workbook workbook, Sheet sheet, int headRow, int headColumn, String headTitle, String parameter);
 }
