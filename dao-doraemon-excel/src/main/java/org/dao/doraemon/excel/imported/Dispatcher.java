@@ -81,10 +81,9 @@ public class Dispatcher implements BeanPostProcessor {
     /**
      * excel 导入数据处理
      *
-     * @param code
-     * @param parameter
-     * @param inputStream
-     * @return
+     * @param code        code
+     * @param parameter   请求参数
+     * @param inputStream 导入文件流
      */
     public ExcelImportResult execute(String code, String parameter, InputStream inputStream) throws IOException {
         ExcelImportWrapper excelImportWrapper = resource.get(code);
@@ -154,23 +153,10 @@ public class Dispatcher implements BeanPostProcessor {
                             errorCell = failDataRow.createCell(headColumn);
                         }
 
-                        // 获取前一列的样式
-                        CellStyle previousCellStyle = null;
-                        if (headColumn > 0) {
-                            Cell previousCell = failDataRow.getCell(headColumn - 1);
-                            if (previousCell != null) {
-                                previousCellStyle = previousCell.getCellStyle();
-                            }
-                        }
-
-                        // 复制样式到错误列
-                        if (previousCellStyle != null) {
-                            errorCell.setCellStyle(previousCellStyle);
-                        }
-
                         // 写入错误信息
                         errorCell.setCellValue(failMessage);
                     }
+                    // todo 怎么样把整个错误列用红色边框
                     String downloadUrl = storageProcessor.submit(new Snowflake(1, 1).nextId() + File.separator + errorProperties.getErrorFileName(), workbook);
                     result.setFailDownloadAddress(downloadUrl);
                 }

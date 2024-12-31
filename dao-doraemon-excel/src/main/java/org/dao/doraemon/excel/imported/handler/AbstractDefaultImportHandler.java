@@ -68,6 +68,6 @@ public abstract class AbstractDefaultImportHandler<T> implements ImportHandler<T
         sheet.autoSizeColumn(headColumn);
 
         int currentColumnWidth = sheet.getColumnWidth(headColumn);
-        sheet.setColumnWidth(headColumn, (int) (currentColumnWidth * 1.2));  // 适当扩大列宽，增加20%
+        sheet.setColumnWidth(headColumn, (int) (currentColumnWidth * 1.3));
     }
 }
