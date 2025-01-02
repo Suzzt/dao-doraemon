@@ -18,7 +18,7 @@ import java.util.Map;
  * @create_time 2024/12/29 17:08
  */
 @ExcelImport(
-        code = "demo",
+        code = "user",
         configuration = @ImportConfiguration(
                 maxRows = 1000,
                 headRow = 1,
@@ -33,7 +33,7 @@ import java.util.Map;
         )
 )
 @Slf4j
-public class DemoBizExcelImportHandler extends AbstractDefaultImportHandler<UserEntity> {
+public class UserBizExcelImportHandler extends AbstractDefaultImportHandler<UserEntity> {
 
     @Override
     public ImportResultModel checkHead(Map<Integer, String> headMap, String requestParameter) {
@@ -44,6 +44,7 @@ public class DemoBizExcelImportHandler extends AbstractDefaultImportHandler<User
     @Override
     public ImportResultModel process(UserEntity data, String requestParameter, AnalysisContext context) {
         log.info("data={}", new Gson().toJson(data));
+        // ReflectionUtils.setField("$name", "commemt", data);
         if(data.getAge()==null){
             return ImportResultModel.success();
         }

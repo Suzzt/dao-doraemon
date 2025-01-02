@@ -2,14 +2,18 @@ package org.dao.doraemon.excel.imported;
 
 import cn.hutool.core.lang.Snowflake;
 import com.alibaba.excel.EasyExcel;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dao.doraemon.excel.annotation.ErrorImportConfiguration;
 import org.dao.doraemon.excel.annotation.ExcelImport;
 import org.dao.doraemon.excel.annotation.ImportConfiguration;
+import org.dao.doraemon.excel.exception.ExcelMarkException;
 import org.dao.doraemon.excel.imported.handler.AbstractDefaultImportHandler;
 import org.dao.doraemon.excel.imported.handler.ImportHandler;
 import org.dao.doraemon.excel.imported.listener.ExcelProcessListener;
+import org.dao.doraemon.excel.imported.resolver.ExcelUtils;
 import org.dao.doraemon.excel.imported.resolver.GenericTypeResolver;
 import org.dao.doraemon.excel.properties.ExcelImportErrorProperties;
 import org.dao.doraemon.excel.properties.ExcelImportProperties;
@@ -19,6 +23,7 @@ import org.dao.doraemon.excel.wrapper.ExcelImportWrapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.HashMap;
@@ -87,7 +92,9 @@ public class Dispatcher implements BeanPostProcessor {
      */
     public ExcelImportResult execute(String code, String parameter, InputStream inputStream) throws IOException {
         ExcelImportWrapper excelImportWrapper = resource.get(code);
-        Assert.notNull(excelImportWrapper, "not fond excel handler, check you code.");
+        if(excelImportWrapper == null) {
+            throw new ExcelMarkException("Not found excel handler, check you code.");
+        }
         ExcelImportProperties excelProperties = excelImportWrapper.getExcelImportProperties();
         ImportHandler<?> importHandler = excelImportWrapper.getImportHandler();
         Class<?> bizClazz = GenericTypeResolver.getGenericType(importHandler.getClass());
@@ -112,10 +119,9 @@ public class Dispatcher implements BeanPostProcessor {
         ExcelImportResult result = new ExcelImportResult();
 
         try {
-            // 使用 EasyExcel 读取数据
             EasyExcel.read(reusableInputStream1, bizClazz, readListener).headRowNumber(excelProperties.getHeadRow()).sheet().doRead();
 
-            // 收集读取结果
+            // 收集处理失败结果
             Map<Integer, String> failCollector = readListener.getFailCollector();
             int totalCount = readListener.getTotalRows();
             int failCount = failCollector.size();
@@ -137,27 +143,19 @@ public class Dispatcher implements BeanPostProcessor {
                     int headColumn = row == null ? 0 : row.getLastCellNum();
                     importHandler.generateErrorHeadStyle(workbook, sheet, headRow, headColumn, errorProperties.getErrorColumnName(), parameter);
 
-                    // 填充错误信息
-                    for (Map.Entry<Integer, String> entry : failCollector.entrySet()) {
-                        Integer failRow = entry.getKey();
-                        String failMessage = entry.getValue();
+                    // 将错误的数据追加写入到原有文件最后一行
+                    ExcelUtils.writeErrorMessage(workbook, sheet, failCollector, headColumn);
 
-                        Row failDataRow = sheet.getRow(failRow);
-                        if (failDataRow == null) {
-                            failDataRow = sheet.createRow(failRow);
-                        }
+                    // todo 增加单元格标识
+                    //ExcelUtils.populateErrorComment(workbook, sheet, );
 
-                        // 确定写入错误信息的列索引
-                        Cell errorCell = failDataRow.getCell(headColumn);
-                        if (errorCell == null) {
-                            errorCell = failDataRow.createCell(headColumn);
-                        }
-
-                        // 写入错误信息
-                        errorCell.setCellValue(failMessage);
+                    // 上传错误文件
+                    String failFileName = importHandler.defineFailFileName(parameter);
+                    if(!StringUtils.hasLength(failFileName)){
+                        failFileName = "ExcelFailedReport.xlsx";
                     }
-                    // todo 怎么样把整个错误列用红色边框
-                    String downloadUrl = storageProcessor.submit(new Snowflake(1, 1).nextId() + File.separator + errorProperties.getErrorFileName(), workbook);
+                    String downloadUrl = storageProcessor.submit(new Snowflake(1, 1).nextId() + File.separator + failFileName, workbook);
+
                     result.setFailDownloadAddress(downloadUrl);
                 }
             }
@@ -166,7 +164,6 @@ public class Dispatcher implements BeanPostProcessor {
             reusableInputStream2.close();
             byteArrayOutputStream.close();
         }
-
         return result;
     }
 

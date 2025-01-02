@@ -3,8 +3,6 @@ package org.dao.doraemon.excel.imported.handler;
 import com.alibaba.excel.context.AnalysisContext;
 import org.apache.poi.ss.usermodel.*;
 import org.dao.doraemon.excel.model.ImportResultModel;
-import org.dao.doraemon.excel.properties.ExcelImportErrorProperties;
-import org.dao.doraemon.excel.properties.ExcelImportProperties;
 
 import java.util.Map;
 
@@ -24,11 +22,7 @@ public abstract class AbstractDefaultImportHandler<T> implements ImportHandler<T
     public abstract ImportResultModel process(T data, String requestParameter, AnalysisContext context);
 
     @Override
-    public String defineFailFileName(ExcelImportProperties excelImportProperties) {
-        ExcelImportErrorProperties excelImportErrorProperties = excelImportProperties.getExcelImportErrorProperties();
-        if (excelImportErrorProperties.getIsGenerateErrorFile()) {
-            return excelImportErrorProperties.getErrorFileName();
-        }
+    public String defineFailFileName(String parameter) {
         return "ExcelFailedReport.xlsx";
     }
 

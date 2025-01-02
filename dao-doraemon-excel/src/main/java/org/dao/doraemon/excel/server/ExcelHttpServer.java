@@ -1,6 +1,7 @@
 package org.dao.doraemon.excel.server;
 
 import org.dao.doraemon.core.ApiResult;
+import org.dao.doraemon.excel.exception.ExcelMarkException;
 import org.dao.doraemon.excel.imported.Dispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,11 @@ public class ExcelHttpServer {
             ExcelImportResult result = dispatcher.execute(code, param, file.getInputStream());
             apiResult.setSuccess(true);
             apiResult.setData(result);
+            return apiResult;
+        } catch (ExcelMarkException e) {
+            LOGGER.error("Excel file process error!", e);
+            apiResult.setSuccess(false);
+            apiResult.setMessage(e.getMessage());
             return apiResult;
         } catch (Exception e) {
             LOGGER.error("Excel file process error!", e);

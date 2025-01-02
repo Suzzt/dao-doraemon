@@ -18,9 +18,9 @@ public @interface ImportConfiguration {
     int maxRows() default Integer.MAX_VALUE;
 
     /**
-     * 表头所在行数(默认从第2行作为表头)
+     * 表头所在行数(默认从第1行作为表头, 索引从第1行开始)
      */
-    int headRow() default 5;
+    int headRow() default 1;
 
     /**
      * 是否校验表头

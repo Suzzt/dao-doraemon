@@ -1,7 +1,6 @@
 package org.dao.doraemon.excel.imported.handler;
 
 import com.alibaba.excel.context.AnalysisContext;
-import com.alibaba.excel.metadata.data.ReadCellData;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.dao.doraemon.excel.model.ImportResultModel;
@@ -31,7 +30,7 @@ public interface ImportHandler<T> {
      *
      * @param data             业务对象
      * @param requestParameter 请求参数
-     * @param context          导入上下文
+     * @param context          导入上下文(from easyexcel), 一般来说没用
      * @return 处理结果定义
      */
     ImportResultModel process(T data, String requestParameter, AnalysisContext context);
@@ -39,10 +38,10 @@ public interface ImportHandler<T> {
     /**
      * 定义导入失败的错误文件名
      *
-     * @param excelImportProperties excel配置
+     * @param parameter excel配置
      * @return 下载时的文件名
      */
-    String defineFailFileName(ExcelImportProperties excelImportProperties);
+    String defineFailFileName(String parameter);
 
 
     /**
