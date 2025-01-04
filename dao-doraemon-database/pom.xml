@@ -19,12 +19,19 @@
 
     <dependencies>
         <dependency>
+            <artifactId>spring-boot-starter</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <artifactId>mybatis</artifactId>
             <groupId>org.mybatis</groupId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis-spring</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
