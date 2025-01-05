@@ -6,7 +6,7 @@ import lombok.Data;
  * 标识信息Model
  *
  * @author sucf
- * @create_time 2025/1/1 18:47
+ * @since 1.0
  */
 @Data
 public class CommentModel {

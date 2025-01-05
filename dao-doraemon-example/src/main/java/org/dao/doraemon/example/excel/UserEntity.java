@@ -7,7 +7,7 @@ import lombok.Data;
  * 导入对象
  *
  * @author sucf
- * @create_time 2024/12/29 17:19
+ * @since 1.0
  */
 @Data
 public class UserEntity {

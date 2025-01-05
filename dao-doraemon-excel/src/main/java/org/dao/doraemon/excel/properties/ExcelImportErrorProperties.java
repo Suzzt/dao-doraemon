@@ -6,7 +6,7 @@ import lombok.Data;
  * Excel 处理存在错误数据, 生成错误文件定义
  *
  * @author sucf
- * @create_time 2024/12/26 19:52
+ * @since 1.0
  */
 @Data
 public class ExcelImportErrorProperties {

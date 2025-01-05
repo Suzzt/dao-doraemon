@@ -9,16 +9,20 @@ import java.io.*;
  * 本地Excel存储管理
  *
  * @author sucf
- * @create_time 2024/12/28 22:35
+ * @since 1.0
  */
 @Component
 public class LocalExcelStorageProcessor implements ExcelStorageProcessor {
 
-    private final String storagePath = "/Users/sucf/Downloads/url/";
+    private final String storageLocalPath;
+
+    public LocalExcelStorageProcessor(String storageLocalPath) {
+        this.storageLocalPath = storageLocalPath;
+    }
 
     @Override
     public String submit(String fileName, Workbook workbook) {
-        String fullPath = storagePath + File.separator + fileName;
+        String fullPath = storageLocalPath + File.separator + fileName;
 
         File file = new File(fullPath);
         File parentDir = file.getParentFile();
@@ -41,14 +45,13 @@ public class LocalExcelStorageProcessor implements ExcelStorageProcessor {
     }
 
 
-
     @Override
     public void delete(String path) {
     }
 
     @Override
     public InputStream download(String path) {
-        File file = new File(storagePath + path);
+        File file = new File(storageLocalPath + path);
         if (file.exists()) {
             try {
                 return new FileInputStream(file);

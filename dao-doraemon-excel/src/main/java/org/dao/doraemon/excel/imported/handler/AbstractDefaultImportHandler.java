@@ -3,7 +3,9 @@ package org.dao.doraemon.excel.imported.handler;
 import com.alibaba.excel.context.AnalysisContext;
 import org.apache.poi.ss.usermodel.*;
 import org.dao.doraemon.excel.model.ImportResultModel;
+import org.dao.doraemon.excel.wrapper.DataWrapper;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,7 +13,7 @@ import java.util.Map;
  * 业务使用集成的入口类
  *
  * @author sucf
- * @create_time 2024/12/28 17:05
+ * @since 1.0
  */
 public abstract class AbstractDefaultImportHandler<T> implements ImportHandler<T> {
 
@@ -20,6 +22,9 @@ public abstract class AbstractDefaultImportHandler<T> implements ImportHandler<T
 
     @Override
     public abstract ImportResultModel process(T data, String requestParameter, AnalysisContext context);
+
+    @Override
+    public abstract List<ImportResultModel> batchProcess(List<DataWrapper<T>> data, String requestParameter);
 
     @Override
     public String defineFailFileName(String parameter) {

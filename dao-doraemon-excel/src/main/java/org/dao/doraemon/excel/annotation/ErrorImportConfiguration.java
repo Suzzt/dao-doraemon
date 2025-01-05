@@ -6,7 +6,7 @@ import java.lang.annotation.*;
  * 配置Excel导入处理的提示错误属性
  *
  * @author sucf
- * @create_time 2024/12/28 23:10
+ * @since 1.0
  */
 
 @Target({ElementType.TYPE})

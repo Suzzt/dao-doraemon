@@ -6,10 +6,11 @@ import lombok.Data;
  * 导入处理结果
  *
  * @author sucf
- * @create_time 2024/12/28 16:45
+ * @since 1.0
  */
 @Data
 public class ImportResultModel {
+
     private String message;
     /**
      * 0:success

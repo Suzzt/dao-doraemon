@@ -7,7 +7,7 @@ import lombok.Data;
  * 配置中涉及到的数字都是从1开始的, 而不是从0开始.
  *
  * @author sucf
- * @create_time 2024/12/26 20:28
+ * @since 1.0
  */
 @Data
 public class ExcelImportProperties {

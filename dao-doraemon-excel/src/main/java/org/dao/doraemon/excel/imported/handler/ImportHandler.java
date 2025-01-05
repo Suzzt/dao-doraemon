@@ -4,15 +4,16 @@ import com.alibaba.excel.context.AnalysisContext;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.dao.doraemon.excel.model.ImportResultModel;
-import org.dao.doraemon.excel.properties.ExcelImportProperties;
+import org.dao.doraemon.excel.wrapper.DataWrapper;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * 导入Excel处理能力接口
  *
  * @author sucf
- * @create_time 2024/12/28 16:42
+ * @since 1.0
  */
 public interface ImportHandler<T> {
 
@@ -34,6 +35,17 @@ public interface ImportHandler<T> {
      * @return 处理结果定义
      */
     ImportResultModel process(T data, String requestParameter, AnalysisContext context);
+
+    /**
+     * 批量处理你的业务
+     * 当你设置定义
+     * {@link org.dao.doraemon.excel.properties.ExcelImportProperties}中的batchProcessRows>1时，会调用此方法
+     *
+     * @param data             批量数据
+     * @param requestParameter 请求参数
+     * @return 处理结果列表
+     */
+    List<ImportResultModel> batchProcess(List<DataWrapper<T>> data, String requestParameter);
 
     /**
      * 定义导入失败的错误文件名

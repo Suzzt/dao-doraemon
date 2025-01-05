@@ -6,7 +6,7 @@ import lombok.Data;
  * Excel 文件导入返回结构
  *
  * @author sucf
- * @create_time 2024/12/26 20:05
+ * @since 1.0
  */
 @Data
 public class ExcelImportResult {

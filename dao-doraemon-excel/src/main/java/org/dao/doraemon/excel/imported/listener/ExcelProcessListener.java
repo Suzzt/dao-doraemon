@@ -11,6 +11,8 @@ import org.dao.doraemon.excel.model.CommentModel;
 import org.dao.doraemon.excel.model.ImportResultModel;
 import org.dao.doraemon.excel.properties.ExcelImportProperties;
 import org.dao.doraemon.excel.wrapper.DataWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -19,9 +21,11 @@ import java.util.*;
  * Excel处理监听
  *
  * @author sucf
- * @since 2024/12/29 15:31
+ * @since 1.0
  */
 public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(ExcelProcessListener.class);
 
     private final ImportHandler<T> handler;
 
@@ -90,7 +94,8 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
         if (excelImportProperties.getMaxRows() < totalRows) {
             throw new ExcelMarkException("The current quantity in the file exceeds the set maximum value (" + excelImportProperties.getMaxRows() + ").");
         }
-
+        Integer batchProcessRows = excelImportProperties.getBatchProcessRows();
+        // todo 这里处理批量
         for (DataWrapper<T> dataWrapper : dataCollector) {
             T entity = dataWrapper.getData();
             // 处理标识
@@ -134,7 +139,7 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
         if (excelImportProperties.getIsCheckHand() && Objects.equals(rowIndex, excelImportProperties.getHeadRow())) {
             ImportResultModel headResult = handler.checkHead(headMap, requestParameter);
             if (headResult.getStatus() == -1) {
-                throw new ExcelHeaderMismatchException(headResult.getMessage(), "期望值", "实际值");
+                throw new ExcelHeaderMismatchException(headResult.getMessage());
             }
         }
     }
@@ -165,8 +170,10 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
                 }
             }
         } catch (Exception e) {
+            LOGGER.error("获取字段对应的列索引失败. clazz: {}, fieldName: {}", clazz, fieldName, e);
             throw new RuntimeException(e);
         }
+        LOGGER.warn("获取字段对应的列索引失败. clazz: {}, fieldName: {}", clazz, fieldName);
         return -1;
     }
 }

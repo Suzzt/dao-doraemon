@@ -8,14 +8,17 @@ import org.dao.doraemon.excel.annotation.ExcelImport;
 import org.dao.doraemon.excel.annotation.ImportConfiguration;
 import org.dao.doraemon.excel.imported.handler.AbstractDefaultImportHandler;
 import org.dao.doraemon.excel.model.ImportResultModel;
+import org.dao.doraemon.excel.wrapper.DataWrapper;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
  * excel import demo
  *
  * @author sucf
- * @create_time 2024/12/29 17:08
+ * @since 1.0
  */
 @ExcelImport(
         code = "user",
@@ -44,16 +47,21 @@ public class UserBizExcelImportHandler extends AbstractDefaultImportHandler<User
     @Override
     public ImportResultModel process(UserEntity data, String requestParameter, AnalysisContext context) {
         log.info("data={}", new Gson().toJson(data));
-        if(data.getAge()==null){
+        if (data.getAge() == null) {
             return ImportResultModel.success();
         }
 
-        if(data.getAge()%3 ==1){
+        if (data.getAge() % 3 == 1) {
             data.setAge$("这是一个标识批复值");
             return ImportResultModel.fail("error data==error data==error data==error data==error data==error data==");
-        }else if(data.getAge()%3 ==2){
+        } else if (data.getAge() % 3 == 2) {
             return ImportResultModel.fail("error");
         }
         return ImportResultModel.success();
+    }
+
+    @Override
+    public List<ImportResultModel> batchProcess(List<DataWrapper<UserEntity>> data, String requestParameter) {
+        return Collections.emptyList();
     }
 }
