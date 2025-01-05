@@ -1,8 +1,12 @@
 package org.dao.doraemon.excel.imported.resolver;
 
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
+import org.apache.poi.xssf.usermodel.XSSFDrawing;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.dao.doraemon.excel.model.CommentModel;
 
+import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +60,40 @@ public class ExcelUtils {
      * @param comments 标识信息
      */
     public static void populateErrorComment(Workbook workbook, Sheet sheet, List<CommentModel> comments) {
+        XSSFDrawing drawing = (XSSFDrawing) sheet.createDrawingPatriarch();
+        // 创建红色边框的样式
+        CellStyle redBorderStyle = createRedBorderStyle(workbook);
+        // 遍历错误数据，为对应单元格添加红色边框和注释
+        for (CommentModel commentModel : comments) {
+            Integer rowIndex = commentModel.getRow();
+            Integer columnIndex = commentModel.getColumn();
+            String message = commentModel.getMessage();
 
+            // 获取或创建行
+            Row row = sheet.getRow(rowIndex);
+            if (row == null) {
+                row = sheet.createRow(rowIndex);
+            }
+
+            // 获取或创建单元格
+            Cell cell = row.getCell(columnIndex);
+            if (cell == null) {
+                cell = row.createCell(columnIndex);
+            }
+            // 应用红色边框样式
+            cell.setCellStyle(redBorderStyle);
+            XSSFClientAnchor anchor = new XSSFClientAnchor();
+            anchor.setCol1(columnIndex+1);
+            anchor.setCol2(columnIndex+3);
+            anchor.setRow1(rowIndex);
+            anchor.setRow2(rowIndex + 1);
+
+            Comment comment = drawing.createCellComment(anchor);
+            comment.setString(new XSSFRichTextString(message));
+            comment.setAuthor("System");
+            cell.setCellComment(comment);
+        }
+        sheet.autoSizeColumn(0);
     }
 
 

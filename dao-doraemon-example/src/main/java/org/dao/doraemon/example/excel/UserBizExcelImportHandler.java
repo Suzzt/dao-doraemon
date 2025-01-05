@@ -44,12 +44,12 @@ public class UserBizExcelImportHandler extends AbstractDefaultImportHandler<User
     @Override
     public ImportResultModel process(UserEntity data, String requestParameter, AnalysisContext context) {
         log.info("data={}", new Gson().toJson(data));
-        // ReflectionUtils.setField("$name", "commemt", data);
         if(data.getAge()==null){
             return ImportResultModel.success();
         }
 
         if(data.getAge()%3 ==1){
+            data.setAge$("这是一个标识批复值");
             return ImportResultModel.fail("error data==error data==error data==error data==error data==error data==");
         }else if(data.getAge()%3 ==2){
             return ImportResultModel.fail("error");

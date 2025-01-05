@@ -19,7 +19,7 @@ import java.util.*;
  * Excel处理监听
  *
  * @author sucf
- * @create_time 2024/12/29 15:31
+ * @since 2024/12/29 15:31
  */
 public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
 
@@ -49,6 +49,7 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
     /**
      * 标识评论收集器
      */
+    @Getter
     private final List<CommentModel> commentCollector = new ArrayList<>();
 
     /**
@@ -63,10 +64,14 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
     @Getter
     private int skipRows = 0;
 
+    /**
+     * entity与excel表头的映射
+     */
+    private Map<String, Integer> fieldMapper;
+
 
     @Override
     public void invoke(T data, AnalysisContext context) {
-
         Integer rowIndex = context.readRowHolder().getRowIndex();
         totalRows++;
         // todo 这里可以用bitMap来优化
@@ -87,8 +92,26 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
         }
 
         for (DataWrapper<T> dataWrapper : dataCollector) {
-            ImportResultModel result = handler.process(dataWrapper.getData(), requestParameter, null);
-            // todo 这里要获取到用户设置的标注信息, 用commentCollector来收集
+            T entity = dataWrapper.getData();
+            // 处理标识
+            Field[] fields = entity.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if (field.getName().endsWith("$")) {
+                    field.setAccessible(true);
+                    Object markVal;
+                    try {
+                        markVal = field.get(entity);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                    String targetFieldName = field.getName().substring(0, field.getName().length() - 1);
+                    if (markVal != null) {
+                        commentCollector.add(new CommentModel(dataWrapper.getIndex(), getColumnIndex(entity.getClass(), targetFieldName), markVal.toString()));
+                    }
+                }
+            }
+            // 处理结果
+            ImportResultModel result = handler.process(entity, requestParameter, null);
             if (result.getStatus() != 0) {
                 if (result.getStatus() == -1) {
                     failCollector.put(dataWrapper.getIndex(), result.getMessage());
@@ -101,6 +124,12 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
 
     @Override
     public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
+        if (fieldMapper == null) {
+            fieldMapper = new HashMap<>();
+            for (Map.Entry<Integer, String> entry : headMap.entrySet()) {
+                fieldMapper.put(entry.getValue(), entry.getKey());
+            }
+        }
         Integer rowIndex = context.readRowHolder().getRowIndex();
         if (excelImportProperties.getIsCheckHand() && Objects.equals(rowIndex, excelImportProperties.getHeadRow())) {
             ImportResultModel headResult = handler.checkHead(headMap, requestParameter);
@@ -110,59 +139,34 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
         }
     }
 
-
-//    // 通过字段名和 AnalysisContext 获取对应的列索引
-//    private int getColumnIndex(AnalysisContext context, String fieldName) {
-//        try {
-//            // 获取当前读取的表格标题行中的列名与列索引的映射关系
-//            Map<Integer, String> columnIndexMap = context.readSheetHolder().getColumnIndexMap();
-//
-//            // 遍历映射关系，找到对应的字段名称
-//            for (Map.Entry<Integer, String> entry : columnIndexMap.entrySet()) {
-//                Integer columnIndex = entry.getKey();
-//                String columnName = entry.getValue();
-//
-//                // 如果字段名称与注解中的列名一致，则返回对应的列索引
-//                if (fieldName.equalsIgnoreCase(getFieldName(UserEntity.class, fieldName))) {
-//                    return columnIndex;
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return -1;  // 如果没有找到字段，返回 -1
-//    }
-//
-//    // 获取字段的名称
-//    private String getFieldName(Class<?> clazz, String fieldName) {
-//        try {
-//            Field field = clazz.getDeclaredField(fieldName);
-//            ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
-//            if (excelProperty != null) {
-//                return excelProperty.value()[0];  // 返回列名（如"姓名"）
-//            }
-//        } catch (NoSuchFieldException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-//
-//    private int getColumnIndex(Class<?> clazz, String fieldName) {
-//        try {
-//            // 获取所有字段
-//            Field[] fields = clazz.getDeclaredFields();
-//            for (Field field : fields) {
-//                // 获取字段上的 @ExcelProperty 注解
-//                ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
-//                if (excelProperty != null) {
-//                    // 如果字段名匹配，返回对应的列索引
-//                    if (field.getName().equals(fieldName)) {
-//                        return excelProperty.index();
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//        }
-//        return -1;  // 如果没有找到字段，返回 -1
-//    }
+    /**
+     * 获取字段对应的列索引
+     *
+     * @param clazz     类对象
+     * @param fieldName 字段名
+     * @return 返回列索引
+     */
+    private int getColumnIndex(Class<?> clazz, String fieldName) {
+        try {
+            Field field = clazz.getDeclaredField(fieldName);
+            ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
+            if (excelProperty != null) {
+                // 如果字段名匹配，返回对应的列索引
+                if (excelProperty.index() >= 0) {
+                    return excelProperty.index();
+                }
+                // 如果字段名不匹配，遍历@ExcelProperty value去匹配
+                String[] excelFields = excelProperty.value();
+                for (String excelField : excelFields) {
+                    Integer index = fieldMapper.get(excelField);
+                    if (index != null && index >= 0) {
+                        return index;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return -1;
+    }
 }

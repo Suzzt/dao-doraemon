@@ -22,7 +22,6 @@ import org.dao.doraemon.excel.storage.ExcelStorageProcessor;
 import org.dao.doraemon.excel.wrapper.ExcelImportWrapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
@@ -146,8 +145,8 @@ public class Dispatcher implements BeanPostProcessor {
                     // 将错误的数据追加写入到原有文件最后一行
                     ExcelUtils.writeErrorMessage(workbook, sheet, failCollector, headColumn);
 
-                    // todo 增加单元格标识
-                    //ExcelUtils.populateErrorComment(workbook, sheet, );
+                    // 将单元格标识值写入到对应设定值中
+                    ExcelUtils.populateErrorComment(workbook, sheet, readListener.getCommentCollector());
 
                     // 上传错误文件
                     String failFileName = importHandler.defineFailFileName(parameter);

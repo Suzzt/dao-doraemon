@@ -13,4 +13,10 @@ public class CommentModel {
     private Integer row;
     private Integer column;
     private String message;
+
+    public CommentModel(Integer row, Integer column, String message) {
+        this.row = row;
+        this.column = column;
+        this.message = message;
+    }
 }
