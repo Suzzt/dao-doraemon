@@ -4,8 +4,9 @@ import lombok.Data;
 
 /**
  * http 返回结果封装类
- * @author  sucf
- * @create_time: 2024-12-26 20:09
+ *
+ * @author sucf
+ * @since 1.0
  */
 @Data
 public class ApiResult<T> {

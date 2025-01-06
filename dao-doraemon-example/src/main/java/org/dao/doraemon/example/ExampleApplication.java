@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Example Application
  *
  * @author sucf
- * @create_time 2024/12/30 23:35
+ * @since 1.0
  */
 @SpringBootApplication
 public class ExampleApplication {

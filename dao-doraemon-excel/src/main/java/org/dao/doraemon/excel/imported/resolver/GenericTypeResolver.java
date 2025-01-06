@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
  * 通用解析
  *
  * @author sucf
- * @create_time 2024/12/29 15:45
+ * @since 1.0
  */
 public class GenericTypeResolver {
 

@@ -7,7 +7,7 @@ import lombok.Data;
  * 配置中涉及到的数字都是从1开始的, 而不是从0开始.
  *
  * @author sucf
- * @create_time 2024/12/26 20:28
+ * @since 1.0
  */
 @Data
 public class ExcelImportProperties {
@@ -17,9 +17,9 @@ public class ExcelImportProperties {
     private Integer maxRows;
 
     /**
-     * 表头所在行数(默认从第2行作为表头)
+     * 表头所在行数(默认从第1行作为表头, 索引从第1行开始)
      */
-    private Integer headRow = 2;
+    private Integer headRow = 1;
 
     /**
      * 是否校验表头
@@ -34,7 +34,7 @@ public class ExcelImportProperties {
     /**
      * 指定跳过的行
      */
-    private int[] skipRow;
+    private int[] skipRow = {};
 
     /**
      * 定义错误提示文件信息

@@ -1,13 +1,12 @@
 package org.dao.doraemon.excel.annotation;
 
 import java.lang.annotation.*;
-import java.util.List;
 
 /**
  * 配置导入属性
  *
  * @author sucf
- * @create_time 2024/12/28 23:09
+ * @since 1.0
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -19,9 +18,9 @@ public @interface ImportConfiguration {
     int maxRows() default Integer.MAX_VALUE;
 
     /**
-     * 表头所在行数(默认从第2行作为表头)
+     * 表头所在行数(默认从第1行作为表头, 索引从第1行开始)
      */
-    int headRow() default 2;
+    int headRow() default 1;
 
     /**
      * 是否校验表头
