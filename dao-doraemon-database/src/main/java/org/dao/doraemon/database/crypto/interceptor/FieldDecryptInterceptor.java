@@ -23,7 +23,7 @@ import org.dao.doraemon.database.crypto.util.MetaObjectCryptoUtil;
  * mybatis解密拦截器
  *
  * @author wuzhenhong
- * @SInCE 1.0
+ * @since 1.0
  */
 @Intercepts({@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {
     Statement.class})})

@@ -9,7 +9,7 @@ import java.util.Arrays;
  * @param <K>
  * @param <V>
  * @author wuzhenhong
- * @SInCE 1.0
+ * @since 1.0
  */
 public class SimpleHashMap<K, V> {
 

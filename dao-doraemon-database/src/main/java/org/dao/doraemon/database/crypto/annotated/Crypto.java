@@ -12,7 +12,7 @@ import org.dao.doraemon.database.crypto.server.EncryptService;
  * 标记某字段是否需要加密字段
  *
  * @author wuzhenhong
- * @SInCE 1.0
+ * @since 1.0
  */
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

@@ -19,7 +19,7 @@ import org.dao.doraemon.database.crypto.constant.MybatisFieldNameCons;
  * 加密保存到数据库之后，有些业务会复用保存前的对象，此时需要将原来的数据还原
  *
  * @author wuzhenhong
- * @SInCE 1.0
+ * @since 1.0
  */
 @Intercepts({@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {
     Statement.class})})

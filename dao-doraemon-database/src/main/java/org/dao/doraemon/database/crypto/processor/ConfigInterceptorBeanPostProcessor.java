@@ -11,7 +11,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
  * @author wuzhenhong
- * @SInCE 1.0
+ * @since 1.0
  */
 public class ConfigInterceptorBeanPostProcessor implements BeanPostProcessor {
 

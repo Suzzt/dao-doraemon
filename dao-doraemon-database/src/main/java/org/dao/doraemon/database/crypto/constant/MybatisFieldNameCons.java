@@ -2,7 +2,7 @@ package org.dao.doraemon.database.crypto.constant;
 
 /**
  * @author wuzhenhong
- * @SInCE 1.0
+ * @since 1.0
  */
 public class MybatisFieldNameCons {
 

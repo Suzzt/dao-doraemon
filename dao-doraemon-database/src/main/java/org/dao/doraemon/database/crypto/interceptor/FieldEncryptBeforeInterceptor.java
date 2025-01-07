@@ -25,7 +25,7 @@ import org.dao.doraemon.database.crypto.util.ThreadLocalUtil;
  * insert与update时对数据加密
  *
  * @author wuzhenhong
- * @SInCE 1.0
+ * @since 1.0
  */
 @Intercepts({@Signature(type = ParameterHandler.class, method = "setParameters", args = {
     PreparedStatement.class})})

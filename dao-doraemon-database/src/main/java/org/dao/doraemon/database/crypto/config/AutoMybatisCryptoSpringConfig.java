@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  * 那么可以通过以下方式动态加入
  *
  * @author wuzhenhong
- * @SInCE 1.0
+ * @since 1.0
  */
 @Configuration
 public class AutoMybatisCryptoSpringConfig {
