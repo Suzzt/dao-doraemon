@@ -1,6 +1,7 @@
 package org.dao.doraemon.database.crypto.config;
 
 import org.dao.doraemon.database.crypto.processor.ConfigInterceptorBeanPostProcessor;
+import org.dao.doraemon.database.crypto.processor.ConfigMapperBeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,5 +18,10 @@ public class AutoMybatisCryptoSpringConfig {
     @Bean
     public ConfigInterceptorBeanPostProcessor configInterceptorBeanPostProcessor() {
         return new ConfigInterceptorBeanPostProcessor();
+    }
+
+    @Bean
+    public ConfigMapperBeanPostProcessor configMapperBeanPostProcessor() {
+        return new ConfigMapperBeanPostProcessor();
     }
 }
