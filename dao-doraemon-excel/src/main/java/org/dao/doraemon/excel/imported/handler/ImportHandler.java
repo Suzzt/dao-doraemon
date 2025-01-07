@@ -3,6 +3,7 @@ package org.dao.doraemon.excel.imported.handler;
 import com.alibaba.excel.context.AnalysisContext;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.dao.doraemon.excel.model.ImportBatchResultModel;
 import org.dao.doraemon.excel.model.ImportResultModel;
 import org.dao.doraemon.excel.wrapper.DataWrapper;
 
@@ -45,7 +46,7 @@ public interface ImportHandler<T> {
      * @param requestParameter 请求参数
      * @return 处理结果列表
      */
-    List<ImportResultModel> batchProcess(List<DataWrapper<T>> data, String requestParameter);
+    List<ImportBatchResultModel> batchProcess(List<DataWrapper<T>> data, String requestParameter);
 
     /**
      * 定义导入失败的错误文件名

@@ -7,10 +7,11 @@ import org.dao.doraemon.excel.annotation.ErrorImportConfiguration;
 import org.dao.doraemon.excel.annotation.ExcelImport;
 import org.dao.doraemon.excel.annotation.ImportConfiguration;
 import org.dao.doraemon.excel.imported.handler.AbstractDefaultImportHandler;
+import org.dao.doraemon.excel.model.ImportBatchResultModel;
 import org.dao.doraemon.excel.model.ImportResultModel;
 import org.dao.doraemon.excel.wrapper.DataWrapper;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +62,20 @@ public class UserBizExcelImportHandler extends AbstractDefaultImportHandler<User
     }
 
     @Override
-    public List<ImportResultModel> batchProcess(List<DataWrapper<UserEntity>> data, String requestParameter) {
-        return Collections.emptyList();
+    public List<ImportBatchResultModel> batchProcess(List<DataWrapper<UserEntity>> data, String requestParameter) {
+        List<ImportBatchResultModel> result = new ArrayList<>(data.size());
+        for (DataWrapper<UserEntity> datum : data) {
+            Integer index = datum.getIndex();
+            UserEntity user = datum.getData();
+            if (user.getAge() % 6 == 1) {
+                user.setAge$("这是一个标识批复值");
+                result.add(ImportBatchResultModel.fail(index, "batch process error"));
+            } else if (user.getAge() % 3 == 2) {
+                result.add(ImportBatchResultModel.fail(index, "batch process error"));
+            } else {
+                result.add(ImportBatchResultModel.success(index));
+            }
+        }
+        return result;
     }
 }

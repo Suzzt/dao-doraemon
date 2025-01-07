@@ -1,6 +1,7 @@
 package org.dao.doraemon.excel.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 导入处理结果
@@ -8,10 +9,15 @@ import lombok.Data;
  * @author sucf
  * @since 1.0
  */
-@Data
+@Getter
+@Setter
 public class ImportResultModel {
 
+    /**
+     * 提示信息
+     */
     private String message;
+
     /**
      * 0:success
      * -1:fail
