@@ -9,13 +9,14 @@ import org.mybatis.spring.mapper.MapperFactoryBean;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
  * @author wuzhenhong
- * @date 2025/1/4 16:55
+ * @since 1.0
  */
 public class ConfigMapperBeanPostProcessor implements BeanPostProcessor, ApplicationContextAware {
 
@@ -23,11 +24,20 @@ public class ConfigMapperBeanPostProcessor implements BeanPostProcessor, Applica
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        // 不处理 FactoryBean
         boolean isFactoryDereference = BeanFactoryUtils.isFactoryDereference(beanName);
-        // 这里只处理由MapperFactoryBean创建的对象
         if (isFactoryDereference) {
             return bean;
         }
+        if(bean instanceof FactoryBean) {
+            return bean;
+        }
+        // 判断是否存在 beanDefinition，像那种在直接在 xml 配置属性为className是没有 beanDefinition 的
+        boolean exists = this.applicationContext.containsBeanDefinition(beanName);
+        if(!exists) {
+            return bean;
+        }
+        // 判断对应的工厂bean类型是否是  MapperFactoryBean
         String factoryBeanName = BeanFactory.FACTORY_BEAN_PREFIX + beanName;
         boolean match = this.applicationContext.isTypeMatch(factoryBeanName, MapperFactoryBean.class);
         if (!match) {
