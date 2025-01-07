@@ -4,7 +4,7 @@ package org.dao.doraemon.database.crypto.server;
  * 解密服务
  *
  * @author wuzhenhong
- * @date 2024/12/27 9:32
+ * @SInCE 1.0
  */
 public interface DecryptService {
 

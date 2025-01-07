@@ -12,6 +12,7 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * AES-对称加密算法（ECB、CBC模式）
  * AES使用128位、192位或256位密钥来加密和解密数据，每次加密或解密需要对数据进行128位、192位或256位的长加密，然后进行异或操作。
+ * @SInCE 1.0
  */
 public class AESUtil {
 

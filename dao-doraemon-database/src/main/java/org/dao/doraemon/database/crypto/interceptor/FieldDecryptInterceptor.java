@@ -17,12 +17,13 @@ import org.dao.doraemon.database.crypto.config.DefaultCryptStrategy;
 import org.dao.doraemon.database.crypto.constant.MybatisFieldNameCons;
 import org.dao.doraemon.database.crypto.server.DecryptService;
 import org.dao.doraemon.database.crypto.util.FieldReflectorUtil;
+import org.dao.doraemon.database.crypto.util.MetaObjectCryptoUtil;
 
 /**
  * mybatis解密拦截器
  *
  * @author wuzhenhong
- * @date 2024/12/27 9:48
+ * @SInCE 1.0
  */
 @Intercepts({@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {
     Statement.class})})
@@ -35,7 +36,7 @@ public class FieldDecryptInterceptor extends AbstractInterceptor {
         MetaObject metaObject = super.forObject(resultSetHandler);
         MappedStatement mappedStatement = (MappedStatement) metaObject.getValue(MybatisFieldNameCons.MAPPED_STATEMENT);
         SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
-        // 只处理dml语句
+        // 只处理查询语句
         if (SqlCommandType.SELECT == sqlCommandType) {
             this.doGetDecryptVal(returnVal, null);
         }
@@ -111,23 +112,7 @@ public class FieldDecryptInterceptor extends AbstractInterceptor {
         if (Objects.isNull(deCryptoAnnotation)) {
             return fieldBean;
         }
-        boolean decrypt = deCryptoAnnotation.decrypt();
-        if (!decrypt) {
-            return fieldBean;
-        }
-        Class<? extends DecryptService>[] decryptServerClass = deCryptoAnnotation.decryptClass();
-        if (Objects.isNull(decryptServerClass) || decryptServerClass.length == 0) {
-            if(Objects.isNull(DefaultCryptStrategy.getDefaultDecrypt())) {
-                throw new RuntimeException("默认解密策略不能设置为空！");
-            } else {
-                decryptServerClass = new Class[] {DefaultCryptStrategy.getDefaultDecrypt()};
-            }
-        }
-        String decryptedValue = fieldBean;
-        for(Class<? extends DecryptService> decryptServiceClazz : decryptServerClass) {
-            DecryptService decryptService = super.getByCache(decryptServiceClazz);
-            decryptedValue = decryptService.decrypt(decryptedValue);
-        }
+        String decryptedValue = MetaObjectCryptoUtil.decryptNess(deCryptoAnnotation, fieldBean);
 
         return decryptedValue;
     }

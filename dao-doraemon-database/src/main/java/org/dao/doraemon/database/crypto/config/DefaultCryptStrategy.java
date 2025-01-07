@@ -13,7 +13,7 @@ import org.springframework.util.ClassUtils;
 
 /**
  * @author wuzhenhong
- * @date 2024/12/30 13:57
+ * @SInCE 1.0
  */
 public class DefaultCryptStrategy {
 

@@ -12,14 +12,14 @@ import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.MetaObject;
-import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshotBo;
+import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshot;
 import org.dao.doraemon.database.crypto.constant.MybatisFieldNameCons;
 
 /**
  * 加密保存到数据库之后，有些业务会复用保存前的对象，此时需要将原来的数据还原
  *
  * @author wuzhenhong
- * @date 2024/12/27 9:48
+ * @SInCE 1.0
  */
 @Intercepts({@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {
     Statement.class})})
@@ -36,7 +36,7 @@ public class FieldEncryptAfterInterceptor extends AbstractInterceptor {
         if (SqlCommandType.INSERT == sqlCommandType ||
             SqlCommandType.UPDATE == sqlCommandType) {
             BoundSql boundSql = (BoundSql) metaObject.getValue(MybatisFieldNameCons.BOUND_SQL);
-            List<FieldEncryptSnapshotBo> infos = (List<FieldEncryptSnapshotBo>) boundSql.getAdditionalParameter(
+            List<FieldEncryptSnapshot> infos = (List<FieldEncryptSnapshot>) boundSql.getAdditionalParameter(
                 FieldEncryptBeforeInterceptor.class
                     .getName().replace(".", "-"));
             if (Objects.nonNull(infos) && !infos.isEmpty()) {

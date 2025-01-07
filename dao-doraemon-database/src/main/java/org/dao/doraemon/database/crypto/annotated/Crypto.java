@@ -12,9 +12,9 @@ import org.dao.doraemon.database.crypto.server.EncryptService;
  * 标记某字段是否需要加密字段
  *
  * @author wuzhenhong
- * @date 2024/12/27 9:48
+ * @SInCE 1.0
  */
-@Target({ElementType.FIELD})
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Crypto {

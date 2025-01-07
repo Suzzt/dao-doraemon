@@ -15,18 +15,17 @@ import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.MetaObject;
 import org.dao.doraemon.database.crypto.annotated.Crypto;
-import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshotBo;
-import org.dao.doraemon.database.crypto.config.DefaultCryptStrategy;
+import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshot;
 import org.dao.doraemon.database.crypto.constant.MybatisFieldNameCons;
-import org.dao.doraemon.database.crypto.server.EncryptService;
 import org.dao.doraemon.database.crypto.util.FieldReflectorUtil;
+import org.dao.doraemon.database.crypto.util.MetaObjectCryptoUtil;
 import org.dao.doraemon.database.crypto.util.ThreadLocalUtil;
 
 /**
  * insert与update时对数据加密
  *
  * @author wuzhenhong
- * @date 2024/12/27 9:48
+ * @SInCE 1.0
  */
 @Intercepts({@Signature(type = ParameterHandler.class, method = "setParameters", args = {
     PreparedStatement.class})})
@@ -45,7 +44,7 @@ public class FieldEncryptBeforeInterceptor extends AbstractInterceptor {
             Object parameter = parameterHandler.getParameterObject();
             try {
                 this.execEncrypt(parameter);
-                List<FieldEncryptSnapshotBo> infos = ThreadLocalUtil.get();
+                List<FieldEncryptSnapshot> infos = ThreadLocalUtil.get();
                 if (Objects.nonNull(infos)) {
                     boundSql.setAdditionalParameter(FieldEncryptBeforeInterceptor.class
                         .getName().replace(".", "-"), infos);
@@ -150,29 +149,13 @@ public class FieldEncryptBeforeInterceptor extends AbstractInterceptor {
         if (Objects.isNull(enOrDecryptAnnotation)) {
             return fieldBean;
         }
-        boolean encrypt = enOrDecryptAnnotation.encrypt();
-        if (!encrypt) {
-            return fieldBean;
-        }
-        Class<? extends EncryptService>[] encryptServerClass = enOrDecryptAnnotation.encryptClass();
-        if (Objects.isNull(encryptServerClass) || encryptServerClass.length == 0) {
-            if(Objects.isNull(DefaultCryptStrategy.getDefaultEncrypt())) {
-                throw new RuntimeException("默认加密策略不能设置为空！");
-            } else {
-                encryptServerClass = new Class[] {DefaultCryptStrategy.getDefaultEncrypt()};
-            }
-        }
-        String encryptedValue = fieldBean;
-        for(Class<? extends EncryptService> encryptServiceClazz : encryptServerClass) {
-            EncryptService encryptService = super.getByCache(encryptServiceClazz);
-            encryptedValue = encryptService.encrypt(encryptedValue);
-        }
-        List<FieldEncryptSnapshotBo> infos = ThreadLocalUtil.get();
+        String encryptedValue = MetaObjectCryptoUtil.encryptNess(enOrDecryptAnnotation, fieldBean);
+        List<FieldEncryptSnapshot> infos = ThreadLocalUtil.get();
         if (Objects.isNull(infos)) {
             infos = new ArrayList<>();
             ThreadLocalUtil.set(infos);
         }
-        FieldEncryptSnapshotBo info = new FieldEncryptSnapshotBo();
+        FieldEncryptSnapshot info = new FieldEncryptSnapshot();
         info.setContainBean(containBean);
         info.setOrigin(fieldBean);
         info.setEncrypt(encryptedValue);

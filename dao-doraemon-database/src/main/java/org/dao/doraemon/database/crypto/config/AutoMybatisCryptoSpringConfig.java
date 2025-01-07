@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Configuration;
  * 那么可以通过以下方式动态加入
  *
  * @author wuzhenhong
- * @date 2024/12/27 10:28
+ * @SInCE 1.0
  */
 @Configuration
-public class AutoMybatisInterceptorSpringConfig {
+public class AutoMybatisCryptoSpringConfig {
 
     @Bean
     public ConfigInterceptorBeanPostProcessor configInterceptorBeanPostProcessor() {

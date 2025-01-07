@@ -1,22 +1,22 @@
 package org.dao.doraemon.database.crypto.util;
 
 import java.util.List;
-import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshotBo;
+import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshot;
 
 /**
  * @author wuzhenhong
- * @date 2024/12/27 9:48
+ * @author wuzhenhong
  */
 public class ThreadLocalUtil {
 
-    private static final ThreadLocal<List<FieldEncryptSnapshotBo>>
+    private static final ThreadLocal<List<FieldEncryptSnapshot>>
         THREAD_LOCAL = new ThreadLocal<>();
 
-    public static void set(List<FieldEncryptSnapshotBo> list) {
+    public static void set(List<FieldEncryptSnapshot> list) {
         THREAD_LOCAL.set(list);
     }
 
-    public static List<FieldEncryptSnapshotBo> get() {
+    public static List<FieldEncryptSnapshot> get() {
         return THREAD_LOCAL.get();
     }
 
