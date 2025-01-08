@@ -21,7 +21,7 @@ public final class MetaObjectCryptoUtil {
     private static final ObjectFactory OBJECT_FACTORY = new DefaultObjectFactory();
     private static final org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
     private static final ReflectorFactory REFLECTOR_FACTORY = new DefaultReflectorFactory();
-    private static final SimpleHashMap<Class<?>, Object> CACHE = new SimpleHashMap<>(512);
+    private static final SimpleHashMap<Class<?>, Object> CACHE = new SimpleHashMap<>(16);
 
     private MetaObjectCryptoUtil() {
         throw new RuntimeException("do not instance!");
