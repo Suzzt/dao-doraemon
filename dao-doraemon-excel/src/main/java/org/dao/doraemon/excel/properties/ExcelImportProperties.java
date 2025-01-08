@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class ExcelImportProperties {
     /**
-     * 限制导入检验最大支持行数
+     * 限制导入检验最大支持行数(如果是设置为100行, 101行的场景就会报错)
      */
     private Integer maxRows;
 
@@ -35,6 +35,11 @@ public class ExcelImportProperties {
      * 指定跳过的行
      */
     private int[] skipRow = {};
+
+    /**
+     * 执行方式配置
+     */
+    private ExcelExecutorProperties executor;
 
     /**
      * 定义错误提示文件信息

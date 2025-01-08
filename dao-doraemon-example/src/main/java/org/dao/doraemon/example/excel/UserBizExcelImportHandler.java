@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.dao.doraemon.excel.annotation.ErrorImportConfiguration;
 import org.dao.doraemon.excel.annotation.ExcelImport;
+import org.dao.doraemon.excel.annotation.ExecutorConfiguration;
 import org.dao.doraemon.excel.annotation.ImportConfiguration;
 import org.dao.doraemon.excel.imported.handler.AbstractDefaultImportHandler;
 import org.dao.doraemon.excel.model.ImportBatchResultModel;
@@ -28,7 +29,10 @@ import java.util.Map;
                 headRow = 1,
                 isCheckHand = false,
                 batchProcessRows = 10,
-                skipRow = {},
+                skipRow = {5, 9},
+                executor = @ExecutorConfiguration(
+                        isParallel = true
+                ),
                 errorImport = @ErrorImportConfiguration(
                         isGenerateErrorFile = true,
                         errorColumnName = "Error Cause",

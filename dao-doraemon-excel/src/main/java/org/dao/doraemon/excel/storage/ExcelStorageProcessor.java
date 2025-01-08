@@ -3,6 +3,7 @@ package org.dao.doraemon.excel.storage;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.InputStream;
+import java.net.UnknownHostException;
 
 /**
  * 定义Excel存储处理管理
@@ -18,14 +19,7 @@ public interface ExcelStorageProcessor {
      * @param workbook Excel文件
      * @return 下载链接
      */
-    String submit(String fileName, Workbook workbook);
-
-    /**
-     * 删除
-     *
-     * @param path 保存路径
-     */
-    void delete(String path);
+    String submit(String fileName, Workbook workbook) throws UnknownHostException;
 
     /**
      * 获取下载文件
