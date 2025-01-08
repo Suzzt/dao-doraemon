@@ -16,12 +16,16 @@ import org.dao.doraemon.database.crypto.server.EncryptService;
  * @author wuzhenhong
  * @since 1.0
  */
-public class MetaObjectCryptoUtil {
+public final class MetaObjectCryptoUtil {
 
     private static final ObjectFactory OBJECT_FACTORY = new DefaultObjectFactory();
     private static final org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
     private static final ReflectorFactory REFLECTOR_FACTORY = new DefaultReflectorFactory();
-    private static final SimpleHashMap<Class<?>, Object> CACHE = new SimpleHashMap<>();
+    private static final SimpleHashMap<Class<?>, Object> CACHE = new SimpleHashMap<>(512);
+
+    private MetaObjectCryptoUtil() {
+        throw new RuntimeException("do not instance!");
+    }
 
     public static  <T> T getByCache(Class<?> clazz) {
         Object value = CACHE.get(clazz);

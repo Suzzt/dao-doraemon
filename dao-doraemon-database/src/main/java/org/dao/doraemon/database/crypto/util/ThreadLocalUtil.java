@@ -7,10 +7,14 @@ import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshot;
  * @author wuzhenhong
  * @author wuzhenhong
  */
-public class ThreadLocalUtil {
+public final class ThreadLocalUtil {
 
     private static final ThreadLocal<List<FieldEncryptSnapshot>>
         THREAD_LOCAL = new ThreadLocal<>();
+
+    private ThreadLocalUtil() {
+        throw new RuntimeException("do not instance!");
+    }
 
     public static void set(List<FieldEncryptSnapshot> list) {
         THREAD_LOCAL.set(list);

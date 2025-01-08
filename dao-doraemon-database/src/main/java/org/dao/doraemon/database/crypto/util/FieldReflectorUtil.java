@@ -13,12 +13,16 @@ import java.util.Objects;
  * @author wuzhenhong
  * @since 1.0
  */
-public class FieldReflectorUtil {
+public final class FieldReflectorUtil {
 
     private static final List<Class<?>> CLASS_LIST = Arrays
         .asList(Object.class, String.class, BigDecimal.class, double.class, Double.class
             , int.class, Integer.class, long.class, Long.class, float.class, Float.class, short.class, Short.class
             , byte.class, Byte.class, boolean.class, Boolean.class);
+
+    private FieldReflectorUtil() {
+        throw new RuntimeException("do not instance!");
+    }
 
     public static List<Field> reflectFields(Object parameter) {
         if (Objects.isNull(parameter)) {

@@ -14,10 +14,14 @@ import javax.crypto.spec.SecretKeySpec;
  * AES使用128位、192位或256位密钥来加密和解密数据，每次加密或解密需要对数据进行128位、192位或256位的长加密，然后进行异或操作。
  * @since 1.0
  */
-public class AESUtil {
+public final class AESUtil {
 
     // 128位密钥 = 16 bytes Key:
-    public static String key128 = "adefgtuigyt";
+    public static final String key128 = "adefgtuigyt";
+
+    private AESUtil() {
+        throw new RuntimeException("do not instance!");
+    }
 
     // String类型加密:
     public static String encryptECB(String key, String input) throws GeneralSecurityException {
