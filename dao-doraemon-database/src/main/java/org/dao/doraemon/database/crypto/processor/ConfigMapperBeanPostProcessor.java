@@ -29,12 +29,12 @@ public class ConfigMapperBeanPostProcessor implements BeanPostProcessor, Applica
         if (isFactoryDereference) {
             return bean;
         }
-        if(bean instanceof FactoryBean) {
+        if (bean instanceof FactoryBean) {
             return bean;
         }
         // 判断是否存在 beanDefinition，像那种在直接在 xml 配置属性为className是没有 beanDefinition 的
         boolean exists = this.applicationContext.containsBeanDefinition(beanName);
-        if(!exists) {
+        if (!exists) {
             return bean;
         }
         // 判断对应的工厂bean类型是否是  MapperFactoryBean
@@ -54,7 +54,7 @@ public class ConfigMapperBeanPostProcessor implements BeanPostProcessor, Applica
                     for (Parameter parameter : parameters) {
                         Crypto enOrDecrypt = parameter.getAnnotation(Crypto.class);
                         Object value = args[index];
-                        if (Objects.nonNull(enOrDecrypt) && value instanceof String ) {
+                        if (Objects.nonNull(enOrDecrypt) && value instanceof String) {
                             if (Objects.nonNull(value)) {
                                 args[index] = MetaObjectCryptoUtil.encryptNess(enOrDecrypt, (String) value);
                             }

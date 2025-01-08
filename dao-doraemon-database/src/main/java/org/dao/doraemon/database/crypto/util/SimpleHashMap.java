@@ -13,9 +13,9 @@ import java.util.Arrays;
  */
 public class SimpleHashMap<K, V> {
 
+    public final static int DEFAULT_SIZE = 8192;
     private final Entry<K, V>[] buckets;
     private final int indexMask;
-    public final static int DEFAULT_SIZE = 8192;
 
     public SimpleHashMap() {
         this(DEFAULT_SIZE);
@@ -71,9 +71,8 @@ public class SimpleHashMap<K, V> {
 
         public final int hash;
         public final K key;
-        public V value;
-
         public final Entry<K, V> next;
+        public V value;
 
         public Entry(K key, V value, int hash, Entry<K, V> next) {
             this.key = key;

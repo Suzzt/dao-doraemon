@@ -17,7 +17,7 @@ public class ConfigInterceptorBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        if(bean instanceof SqlSessionFactory) {
+        if (bean instanceof SqlSessionFactory) {
             // 会进入该方法的入口
             // org.springframework.beans.factory.support.FactoryBeanRegistrySupport.getObjectFromFactoryBean
             DefaultCryptStrategy.loadDefaultCrypto();

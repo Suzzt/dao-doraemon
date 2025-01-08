@@ -27,7 +27,7 @@ public final class MetaObjectCryptoUtil {
         throw new RuntimeException("do not instance!");
     }
 
-    public static  <T> T getByCache(Class<?> clazz) {
+    public static <T> T getByCache(Class<?> clazz) {
         Object value = CACHE.get(clazz);
         if (Objects.nonNull(value)) {
             return (T) value;

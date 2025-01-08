@@ -23,6 +23,7 @@ public @interface Crypto {
      * 被标注的字段是否需要加密
      */
     boolean encrypt() default true;
+
     /**
      * 被标注的字段是否需要解密
      */

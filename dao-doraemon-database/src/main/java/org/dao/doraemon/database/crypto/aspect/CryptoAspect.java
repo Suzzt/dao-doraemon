@@ -31,7 +31,7 @@ public class CryptoAspect {
                 for (Parameter parameter : parameters) {
                     Crypto enOrDecrypt = parameter.getAnnotation(Crypto.class);
                     Object value = args[index];
-                    if (Objects.nonNull(enOrDecrypt) && value instanceof String ) {
+                    if (Objects.nonNull(enOrDecrypt) && value instanceof String) {
                         if (Objects.nonNull(value)) {
                             args[index] = MetaObjectCryptoUtil.encryptNess(enOrDecrypt, (String) value);
                         }

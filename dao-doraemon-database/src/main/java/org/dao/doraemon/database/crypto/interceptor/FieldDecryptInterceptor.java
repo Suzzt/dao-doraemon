@@ -8,14 +8,13 @@ import java.util.Objects;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.MetaObject;
 import org.dao.doraemon.database.crypto.annotated.Crypto;
-import org.dao.doraemon.database.crypto.config.DefaultCryptStrategy;
 import org.dao.doraemon.database.crypto.constant.MybatisFieldNameCons;
-import org.dao.doraemon.database.crypto.server.DecryptService;
 import org.dao.doraemon.database.crypto.util.FieldReflectorUtil;
 import org.dao.doraemon.database.crypto.util.MetaObjectCryptoUtil;
 
@@ -27,13 +26,13 @@ import org.dao.doraemon.database.crypto.util.MetaObjectCryptoUtil;
  */
 @Intercepts({@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {
     Statement.class})})
-public class FieldDecryptInterceptor extends AbstractInterceptor {
+public class FieldDecryptInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         Object returnVal = invocation.proceed();
         ResultSetHandler resultSetHandler = (ResultSetHandler) invocation.getTarget();
-        MetaObject metaObject = super.forObject(resultSetHandler);
+        MetaObject metaObject = MetaObjectCryptoUtil.forObject(resultSetHandler);
         MappedStatement mappedStatement = (MappedStatement) metaObject.getValue(MybatisFieldNameCons.MAPPED_STATEMENT);
         SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
         // 只处理查询语句
