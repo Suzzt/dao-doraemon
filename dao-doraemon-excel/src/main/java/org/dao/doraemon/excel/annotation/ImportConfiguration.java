@@ -12,6 +12,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface ImportConfiguration {
+
     /**
      * 限制导入检验最大支持行数
      */
@@ -36,6 +37,11 @@ public @interface ImportConfiguration {
      * 指定跳过的行
      */
     int[] skipRow() default {};
+
+    /**
+     * 执行器
+     */
+    ExecutorConfiguration executor() default @ExecutorConfiguration;
 
     /**
      * 错误导入配置

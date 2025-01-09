@@ -1,14 +1,18 @@
 package org.dao.doraemon.excel.imported.listener;
 
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import lombok.Getter;
+import org.dao.doraemon.excel.exception.ExcelBizException;
 import org.dao.doraemon.excel.exception.ExcelHeaderMismatchException;
 import org.dao.doraemon.excel.exception.ExcelMarkException;
 import org.dao.doraemon.excel.imported.handler.ImportHandler;
 import org.dao.doraemon.excel.model.CommentModel;
+import org.dao.doraemon.excel.model.ImportBatchResultModel;
 import org.dao.doraemon.excel.model.ImportResultModel;
+import org.dao.doraemon.excel.properties.ExcelExecutorProperties;
 import org.dao.doraemon.excel.properties.ExcelImportProperties;
 import org.dao.doraemon.excel.wrapper.DataWrapper;
 import org.slf4j.Logger;
@@ -16,126 +20,66 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
- * Excel处理监听
+ * Excel处理监听驱动
  *
  * @author sucf
  * @since 1.0
  */
 public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ExcelProcessListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelProcessListener.class);
 
     private final ImportHandler<T> handler;
-
     private final ExcelImportProperties excelImportProperties;
-
     private final String requestParameter;
+    private final BitSet skipRowBitSet;
+
+    private final List<DataWrapper<T>> dataCollector = new ArrayList<>();
+    @Getter
+    private final Map<Integer, String> failCollector = new HashMap<>();
+    @Getter
+    private final List<CommentModel> commentCollector = new ArrayList<>();
+
+    @Getter
+    private int totalRows = 0;
+    @Getter
+    private int skipRows = 0;
+    private Map<String, Integer> fieldMapper;
 
     public ExcelProcessListener(ImportHandler<T> handler, ExcelImportProperties excelImportProperties, String requestParameter) {
         this.handler = handler;
         this.excelImportProperties = excelImportProperties;
         this.requestParameter = requestParameter;
+
+        // 初始化跳过的行
+        skipRowBitSet = new BitSet();
+        for (int row : excelImportProperties.getSkipRow()) {
+            skipRowBitSet.set(row);
+        }
     }
-
-    /**
-     * 数据收集器
-     */
-    private final List<DataWrapper<T>> dataCollector = new ArrayList<>();
-
-    /**
-     * 失败错误收集器
-     */
-    @Getter
-    private final Map<Integer, String> failCollector = new HashMap<>();
-
-    /**
-     * 标识评论收集器
-     */
-    @Getter
-    private final List<CommentModel> commentCollector = new ArrayList<>();
-
-    /**
-     * 总行数
-     */
-    @Getter
-    private int totalRows = 0;
-
-    /**
-     * 跳过行数
-     */
-    @Getter
-    private int skipRows = 0;
-
-    /**
-     * entity与excel表头的映射
-     */
-    private Map<String, Integer> fieldMapper;
-
 
     @Override
     public void invoke(T data, AnalysisContext context) {
-        Integer rowIndex = context.readRowHolder().getRowIndex();
+        int rowIndex = context.readRowHolder().getRowIndex();
         totalRows++;
-        // todo 这里可以用bitMap来优化
-        int[] skipRow = excelImportProperties.getSkipRow();
-        for (int i : skipRow) {
-            if (i == rowIndex) {
-                skipRows++;
-                return;
-            }
+        if (skipRowBitSet.get(rowIndex)) {
+            skipRows++;
+            return;
         }
-        dataCollector.add(new DataWrapper<T>(rowIndex, data));
-    }
-
-    @Override
-    public void doAfterAllAnalysed(AnalysisContext context) {
-        if (excelImportProperties.getMaxRows() < totalRows) {
-            throw new ExcelMarkException("The current quantity in the file exceeds the set maximum value (" + excelImportProperties.getMaxRows() + ").");
-        }
-        Integer batchProcessRows = excelImportProperties.getBatchProcessRows();
-        // todo 这里处理批量
-        for (DataWrapper<T> dataWrapper : dataCollector) {
-            T entity = dataWrapper.getData();
-            // 处理标识
-            Field[] fields = entity.getClass().getDeclaredFields();
-            for (Field field : fields) {
-                if (field.getName().endsWith("$")) {
-                    field.setAccessible(true);
-                    Object markVal;
-                    try {
-                        markVal = field.get(entity);
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                    String targetFieldName = field.getName().substring(0, field.getName().length() - 1);
-                    if (markVal != null) {
-                        commentCollector.add(new CommentModel(dataWrapper.getIndex(), getColumnIndex(entity.getClass(), targetFieldName), markVal.toString()));
-                    }
-                }
-            }
-            // 处理结果
-            ImportResultModel result = handler.process(entity, requestParameter, null);
-            if (result.getStatus() != 0) {
-                if (result.getStatus() == -1) {
-                    failCollector.put(dataWrapper.getIndex(), result.getMessage());
-                } else {
-                    skipRows++;
-                }
-            }
-        }
+        dataCollector.add(new DataWrapper<>(rowIndex, data));
     }
 
     @Override
     public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
         if (fieldMapper == null) {
             fieldMapper = new HashMap<>();
-            for (Map.Entry<Integer, String> entry : headMap.entrySet()) {
-                fieldMapper.put(entry.getValue(), entry.getKey());
-            }
+            headMap.forEach((key, value) -> fieldMapper.put(value, key));
         }
-        Integer rowIndex = context.readRowHolder().getRowIndex();
+
+        int rowIndex = context.readRowHolder().getRowIndex();
         if (excelImportProperties.getIsCheckHand() && Objects.equals(rowIndex, excelImportProperties.getHeadRow())) {
             ImportResultModel headResult = handler.checkHead(headMap, requestParameter);
             if (headResult.getStatus() == -1) {
@@ -144,36 +88,150 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
         }
     }
 
+    @Override
+    public void doAfterAllAnalysed(AnalysisContext context) {
+        if (totalRows > excelImportProperties.getMaxRows()) {
+            throw new ExcelMarkException("文件中的数量超过设置的最大值 (" + excelImportProperties.getMaxRows() + ")");
+        }
+
+        ExcelExecutorProperties executor = excelImportProperties.getExecutor();
+        if (executor.getIsParallel()) {
+            ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(executor.getCoreNumber(), executor.getCoreNumber(), 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(executor.getCapacity()), r -> new Thread(r, "Excel import executor=[" + r.hashCode() + "]"));
+            CompletionService<Void> completionService = new ExecutorCompletionService<>(threadPoolExecutor);
+            int batchProcessRows = excelImportProperties.getBatchProcessRows();
+            int taskNum = 0;
+            if (batchProcessRows > 1) {
+                List<List<DataWrapper<T>>> splitData = CollUtil.split(dataCollector, batchProcessRows);
+                for (List<DataWrapper<T>> datum : splitData) {
+                    taskNum++;
+                    completionService.submit(() -> {
+                        processBatch(datum);
+                        return null;
+                    });
+                }
+            } else {
+                for (DataWrapper<T> dataWrapper : dataCollector) {
+                    taskNum++;
+                    completionService.submit(() -> {
+                        processOne(dataWrapper);
+                        return null;
+                    });
+                }
+            }
+
+            try {
+                for (int i = 0; i < taskNum; i++) {
+                    completionService.take();
+                }
+            } catch (Exception e) {
+                threadPoolExecutor.shutdownNow();
+                throw new ExcelBizException(e.getMessage());
+            }
+            threadPoolExecutor.shutdown();
+        } else {
+            int batchProcessRows = excelImportProperties.getBatchProcessRows();
+            if (batchProcessRows > 1) {
+                List<List<DataWrapper<T>>> splitData = CollUtil.split(dataCollector, batchProcessRows);
+                splitData.forEach(this::processBatch);
+            } else {
+                dataCollector.forEach(this::processOne);
+            }
+        }
+    }
+
     /**
-     * 获取字段对应的列索引
+     * 批量处理数据
      *
-     * @param clazz     类对象
-     * @param fieldName 字段名
-     * @return 返回列索引
+     * @param dataWrappers 批量数据
+     */
+    private void processBatch(List<DataWrapper<T>> dataWrappers) {
+        List<ImportBatchResultModel> resultList = handler.batchProcess(dataWrappers, requestParameter);
+        for (ImportBatchResultModel result : resultList) {
+            if (result.getStatus() != 0) {
+                if (result.getStatus() == -1) {
+                    failCollector.put(result.getIndex(), result.getMessage());
+                } else {
+                    skipRows++;
+                }
+            }
+        }
+        for (DataWrapper<T> dataWrapper : dataWrappers) {
+            concludeComment(dataWrapper);
+        }
+    }
+
+    /**
+     * 单条处理
+     *
+     * @param dataWrapper 单条数据
+     */
+    private void processOne(DataWrapper<T> dataWrapper) {
+        T entity = dataWrapper.getData();
+        ImportResultModel result = handler.process(entity, requestParameter, null);
+
+        if (result.getStatus() != 0) {
+            if (result.getStatus() == -1) {
+                failCollector.put(dataWrapper.getIndex(), result.getMessage());
+            } else {
+                skipRows++;
+            }
+        }
+        concludeComment(dataWrapper);
+    }
+
+    /**
+     * 处理归纳标识
+     *
+     * @param dataWrapper 对象数据
+     */
+    private void concludeComment(DataWrapper<T> dataWrapper) {
+        T entity = dataWrapper.getData();
+        Field[] fields = entity.getClass().getDeclaredFields();
+
+        for (Field field : fields) {
+            if (field.getName().endsWith("$")) {
+                field.setAccessible(true);
+                try {
+                    Object markVal = field.get(entity);
+                    if (markVal != null) {
+                        String targetFieldName = field.getName().substring(0, field.getName().length() - 1);
+                        commentCollector.add(new CommentModel(dataWrapper.getIndex(), getColumnIndex(entity.getClass(), targetFieldName), markVal.toString()));
+                    }
+                } catch (IllegalAccessException e) {
+                    LOGGER.error("处理标识失败，字段名：{}", field.getName(), e);
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    /**
+     * 字段所在列数
+     *
+     * @param clazz     对象类
+     * @param fieldName 类字段名
+     * @return 从0开始的列数
      */
     private int getColumnIndex(Class<?> clazz, String fieldName) {
         try {
             Field field = clazz.getDeclaredField(fieldName);
             ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
+
             if (excelProperty != null) {
-                // 如果字段名匹配，返回对应的列索引
                 if (excelProperty.index() >= 0) {
                     return excelProperty.index();
                 }
-                // 如果字段名不匹配，遍历@ExcelProperty value去匹配
-                String[] excelFields = excelProperty.value();
-                for (String excelField : excelFields) {
+                for (String excelField : excelProperty.value()) {
                     Integer index = fieldMapper.get(excelField);
-                    if (index != null && index >= 0) {
+                    if (index != null) {
                         return index;
                     }
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("获取字段对应的列索引失败. clazz: {}, fieldName: {}", clazz, fieldName, e);
-            throw new RuntimeException(e);
+            LOGGER.error("获取字段对应列索引失败: clazz={}, fieldName={}", clazz, fieldName, e);
         }
-        LOGGER.warn("获取字段对应的列索引失败. clazz: {}, fieldName: {}", clazz, fieldName);
+        LOGGER.warn("字段未找到列索引: clazz={}, fieldName={}", clazz, fieldName);
         return -1;
     }
 }

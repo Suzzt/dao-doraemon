@@ -8,7 +8,6 @@ import java.lang.annotation.*;
  * @author sucf
  * @since 1.0
  */
-
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

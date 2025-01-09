@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dao.doraemon.excel.annotation.ErrorImportConfiguration;
 import org.dao.doraemon.excel.annotation.ExcelImport;
+import org.dao.doraemon.excel.annotation.ExecutorConfiguration;
 import org.dao.doraemon.excel.annotation.ImportConfiguration;
 import org.dao.doraemon.excel.exception.ExcelMarkException;
 import org.dao.doraemon.excel.imported.handler.AbstractDefaultImportHandler;
@@ -15,6 +16,7 @@ import org.dao.doraemon.excel.imported.handler.ImportHandler;
 import org.dao.doraemon.excel.imported.listener.ExcelProcessListener;
 import org.dao.doraemon.excel.imported.resolver.ExcelUtils;
 import org.dao.doraemon.excel.imported.resolver.GenericTypeResolver;
+import org.dao.doraemon.excel.properties.ExcelExecutorProperties;
 import org.dao.doraemon.excel.properties.ExcelImportErrorProperties;
 import org.dao.doraemon.excel.properties.ExcelImportProperties;
 import org.dao.doraemon.excel.server.ExcelImportResult;
@@ -64,17 +66,25 @@ public class Dispatcher implements BeanPostProcessor {
     private static ExcelImportWrapper getExcelImportWrapper(ExcelImport annotation, ImportHandler<?> importHandler) {
         ImportConfiguration configuration = annotation.configuration();
         ErrorImportConfiguration errorImportConfiguration = configuration.errorImport();
+        ExecutorConfiguration executorConfiguration = configuration.executor();
         ExcelImportProperties properties = new ExcelImportProperties();
         properties.setMaxRows(configuration.maxRows());
         properties.setHeadRow(configuration.headRow());
         properties.setIsCheckHand(configuration.isCheckHand());
         properties.setBatchProcessRows(configuration.batchProcessRows());
         properties.setSkipRow(configuration.skipRow());
+
         ExcelImportErrorProperties errorProperties = new ExcelImportErrorProperties();
         errorProperties.setIsGenerateErrorFile(errorImportConfiguration.isGenerateErrorFile());
         errorProperties.setErrorFileName(errorImportConfiguration.errorFileName());
         errorProperties.setErrorColumnName(errorImportConfiguration.errorColumnName());
         properties.setExcelImportErrorProperties(errorProperties);
+
+        ExcelExecutorProperties executor = new ExcelExecutorProperties();
+        executor.setIsParallel(executorConfiguration.isParallel());
+        executor.setCoreNumber(executorConfiguration.coreNumber());
+        executor.setCapacity(executorConfiguration.capacity());
+        properties.setExecutor(executor);
 
         ExcelImportWrapper excelImportWrapper = new ExcelImportWrapper();
         excelImportWrapper.setExcelImportProperties(properties);
@@ -127,7 +137,7 @@ public class Dispatcher implements BeanPostProcessor {
             int skipCount = readListener.getSkipRows();
             result.setTotalCount(totalCount);
             result.setFailCount(failCount);
-            result.setSuccessCount(totalCount - failCount);
+            result.setSuccessCount(totalCount - failCount - skipCount);
             result.setSkipCount(skipCount);
 
             // 如果需要生成错误文件
@@ -154,7 +164,6 @@ public class Dispatcher implements BeanPostProcessor {
                         failFileName = "ExcelFailedReport.xlsx";
                     }
                     String downloadUrl = storageProcessor.submit(new Snowflake(1, 1).nextId() + File.separator + failFileName, workbook);
-
                     result.setFailDownloadAddress(downloadUrl);
                 }
             }
