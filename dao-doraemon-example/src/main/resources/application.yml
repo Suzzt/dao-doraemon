@@ -2,3 +2,56 @@ dao_doraemon:
   excel:
     storage:
       local_path: /Users/sucf/Downloads/excel/
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  tomcat:
+    threads:
+      max: 200 # Maximum amount of worker threads.
+      min-spare: 10 # Minimum amount of worker threads.
+  error:
+    path: /system/error
+
+mybatis-plus:
+  mapper-locations: classpath*:/mybatis/*.xml
+  config-location: classpath:mybatis-config.xml
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+  mvc:
+    format:
+      date-time: "yyyy-MM-dd HH:mm:ss"
+    dispatch-trace-request: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    default-property-inclusion: NON_NULL
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      stat-view-servlet.enabled: false
+      web-stat-filter.enabled: false
+      filters: stat
+      maxActive: 20
+      initialSize: 1
+      maxWait: 60000
+      minIdle: 1
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 'x'
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      maxOpenPreparedStatements: 20
+      useGlobalDataSourceStat: false
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=1000;druid.stat.logSlowSql=true
+      url: jdbc:mysql://127.0.0.1:3306/crypto_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
+      username: root
+      password: lx_doc_test

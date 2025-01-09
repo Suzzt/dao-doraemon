@@ -30,7 +30,7 @@ import org.dao.doraemon.database.crypto.util.ThreadLocalUtil;
  */
 @Intercepts({@Signature(type = ParameterHandler.class, method = "setParameters", args = {
     PreparedStatement.class})})
-public class FieldEncryptBeforeInterceptor implements Interceptor {
+public class FieldEncryptInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -38,23 +38,32 @@ public class FieldEncryptBeforeInterceptor implements Interceptor {
         MetaObject metaObject = MetaObjectCryptoUtil.forObject(parameterHandler);
         MappedStatement mappedStatement = (MappedStatement) metaObject.getValue(MybatisFieldNameCons.MAPPED_STATEMENT);
         SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
+        List<FieldEncryptSnapshot> infos = null;
         // 只处理dml语句
         if (SqlCommandType.INSERT == sqlCommandType ||
             SqlCommandType.UPDATE == sqlCommandType) {
-            BoundSql boundSql = (BoundSql) metaObject.getValue(MybatisFieldNameCons.BOUND_SQL);
             Object parameter = parameterHandler.getParameterObject();
             try {
                 this.execEncrypt(parameter);
-                List<FieldEncryptSnapshot> infos = ThreadLocalUtil.get();
-                if (Objects.nonNull(infos)) {
-                    boundSql.setAdditionalParameter(FieldEncryptBeforeInterceptor.class
-                        .getName().replace(".", "-"), infos);
-                }
+                infos = ThreadLocalUtil.get();
             } finally {
                 ThreadLocalUtil.remove();
             }
         }
-        return invocation.proceed();
+        Object returnVal = invocation.proceed();
+        if (Objects.nonNull(infos) && !infos.isEmpty()) {
+            infos.stream().forEach(info -> {
+                Field field = info.getField();
+                field.setAccessible(true);
+                try {
+                    // 还原调用插入和更新的值，以便业务复用这些对象
+                    field.set(info.getContainBean(), info.getOrigin());
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        return returnVal;
     }
 
     private void execEncrypt(Object parameter) throws IllegalAccessException {

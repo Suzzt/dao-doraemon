@@ -4,8 +4,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.dao.doraemon.database.crypto.config.DefaultCryptStrategy;
 import org.dao.doraemon.database.crypto.interceptor.FieldDecryptInterceptor;
-import org.dao.doraemon.database.crypto.interceptor.FieldEncryptAfterInterceptor;
-import org.dao.doraemon.database.crypto.interceptor.FieldEncryptBeforeInterceptor;
+import org.dao.doraemon.database.crypto.interceptor.FieldEncryptInterceptor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
@@ -23,11 +22,9 @@ public class ConfigInterceptorBeanPostProcessor implements BeanPostProcessor {
             DefaultCryptStrategy.loadDefaultCrypto();
             SqlSessionFactory sqlSessionFactory = (SqlSessionFactory) bean;
             Configuration configuration = sqlSessionFactory.getConfiguration();
-            FieldEncryptBeforeInterceptor fieldEncryptBeforeInterceptor = new FieldEncryptBeforeInterceptor();
-            FieldEncryptAfterInterceptor fieldEncryptAfterInterceptor = new FieldEncryptAfterInterceptor();
+            FieldEncryptInterceptor fieldEncryptInterceptor = new FieldEncryptInterceptor();
             FieldDecryptInterceptor fieldDecryptInterceptor = new FieldDecryptInterceptor();
-            configuration.addInterceptor(fieldEncryptBeforeInterceptor);
-            configuration.addInterceptor(fieldEncryptAfterInterceptor);
+            configuration.addInterceptor(fieldEncryptInterceptor);
             configuration.addInterceptor(fieldDecryptInterceptor);
         }
         return bean;

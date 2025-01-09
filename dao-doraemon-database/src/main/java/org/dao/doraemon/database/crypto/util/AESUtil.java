@@ -18,7 +18,7 @@ import javax.crypto.spec.SecretKeySpec;
 public final class AESUtil {
 
     // 128位密钥 = 16 bytes Key:
-    public static final String key128 = "adefgtuigyt";
+    public static final String key128 = "adefgtuigyt11111";
 
     private AESUtil() {
         throw new RuntimeException("do not instance!");
