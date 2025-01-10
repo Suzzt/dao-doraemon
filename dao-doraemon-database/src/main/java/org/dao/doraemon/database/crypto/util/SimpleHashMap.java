@@ -3,8 +3,16 @@ package org.dao.doraemon.database.crypto.util;
 import java.util.Arrays;
 
 /**
- * 固定大小的简单 hashMap，该 hashmap
+ * 注意：
+ * 该 hashmap 是固定大小的简单 hashMap，该 hashmap
  * 主要用于多元模式下的并发编程，请注意使用场景
+ * 有些兄弟看到这个集合的时候非常疑惑，它线程不安全啊，
+ * 首先该集合固定大小不会扩容，第二在修改方面，它只有 put 的逻辑，没有删除的逻辑
+ * 也就是说只有在 put 的时候会发生线程安全问题，但是这个线程安全问题只是发生覆盖，
+ * 所以这个时候你要明确你的使用场景，比如我的使用场景是用于缓存策略实例，className -》instance
+ * 那么在并发情况下，会出现多个线程同时构建同一个className，然后往里放的情况，但是对于我缓存来说
+ * 并不会出现错误。之前是使用 ConcurrentHashMap 后边我感觉它要加锁，对性能有影响，所以想这种全局的缓存
+ * 我觉得使用 SimpleHashMap 是比较合适的
  *
  * @param <K>
  * @param <V>
