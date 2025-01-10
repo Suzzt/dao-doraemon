@@ -13,4 +13,10 @@
     <result column="update_at" property="updateAt"/>
     <result column="status" property="status"/>
   </resultMap>
+
+  <update id="updatePasswordByAccount">
+    update sys_user_info
+      set password = #{password}
+    where account = #{account}
+  </update>
 </mapper>

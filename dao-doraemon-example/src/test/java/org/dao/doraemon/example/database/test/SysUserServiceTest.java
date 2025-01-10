@@ -2,6 +2,7 @@ package org.dao.doraemon.example.database.test;
 
 import cn.hutool.json.JSONUtil;
 import java.time.LocalDateTime;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.dao.doraemon.example.database.App;
 import org.dao.doraemon.example.database.dao.entity.SysUserInfo;
 import org.dao.doraemon.example.database.service.ISysUserInfoService;
@@ -36,6 +37,38 @@ public class SysUserServiceTest {
         sysUserInfo.setStatus(0);
 
         sysUserInfoService.save(sysUserInfo);
+
+        System.out.println(JSONUtil.toJsonStr(sysUserInfo));
+    }
+
+    @Test
+    public void query() {
+
+        SysUserInfo sysUserInfo = sysUserInfoService.lambdaQuery().eq(SysUserInfo::getAccount, "junmo")
+                .one();
+
+        System.out.println(JSONUtil.toJsonStr(sysUserInfo));
+    }
+
+    @Test
+    public void mapper() {
+
+        sysUserInfoService.updatePasswordByAccount("666", "junmo");
+
+        SysUserInfo sysUserInfo = sysUserInfoService.lambdaQuery().eq(SysUserInfo::getAccount, "junmo")
+            .one();
+
+        System.out.println(JSONUtil.toJsonStr(sysUserInfo));
+    }
+
+
+    @Test
+    public void sqlSession() {
+
+        sysUserInfoService.updatePasswordByAccountSqlSession("888", "junmo");
+
+        SysUserInfo sysUserInfo = sysUserInfoService.lambdaQuery().eq(SysUserInfo::getAccount, "junmo")
+            .one();
 
         System.out.println(JSONUtil.toJsonStr(sysUserInfo));
     }

@@ -33,7 +33,7 @@ public class SysUserInfo implements Serializable {
 
     private String account;
 
-    @Crypto(encrypt = true, decrypt = false)
+    @Crypto(encrypt = true, decrypt = true)
     private String password;
 
     private String avatar;

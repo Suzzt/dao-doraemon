@@ -1,6 +1,8 @@
 package org.dao.doraemon.example.database.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+import org.dao.doraemon.database.crypto.annotated.Crypto;
 import org.dao.doraemon.example.database.dao.entity.SysUserInfo;
 
 /**
@@ -13,4 +15,5 @@ import org.dao.doraemon.example.database.dao.entity.SysUserInfo;
  */
 public interface SysUserInfoMapper extends BaseMapper<SysUserInfo> {
 
+    int updatePasswordByAccount(@Crypto @Param("password") String password, @Param("account") String account);
 }
