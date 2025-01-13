@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
  * 系统-用户信息 服务实现类
  * </p>
  *
- * @author author
- * @since 2024-05-13
+ * @author wuzhenhong
+ * @since 1.0
  */
 @CryptoNecessary
 @Service
@@ -46,5 +46,20 @@ public class SysUserInfoServiceImpl extends ServiceImpl<SysUserInfoMapper, SysUs
     @Override
     public List<SysUserInfo> queryByPassword(SysUserInfo query) {
         return super.baseMapper.queryByPassword(query);
+    }
+
+    @Override
+    public int deleteByPassword(String password) {
+        return super.baseMapper.deleteByPassword(password);
+    }
+
+    @Override
+    public int updateByPassword(String newPassword, String oldPassword) {
+        return super.baseMapper.updateByPassword(newPassword, oldPassword);
+    }
+
+    @Override
+    public int updateEntityByPassword(SysUserInfo update, String oldPassword) {
+        return super.baseMapper.updateEntityByPassword(update, oldPassword);
     }
 }

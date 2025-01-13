@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author wuzhenhong
- * @date 2024/5/17 9:19
+ * @since 1.0
  */
 @Configuration
 public class BeanConfig {

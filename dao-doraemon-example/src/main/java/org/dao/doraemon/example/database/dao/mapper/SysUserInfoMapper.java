@@ -11,12 +11,18 @@ import org.dao.doraemon.example.database.dao.entity.SysUserInfo;
  * 系统-用户信息 Mapper 接口
  * </p>
  *
- * @author author
- * @since 2024-05-13
+ * @author wuzhenhong
+ * @since 1.0
  */
 public interface SysUserInfoMapper extends BaseMapper<SysUserInfo> {
 
     int updatePasswordByAccount(@Crypto @Param("password") String password, @Param("account") String account);
 
     List<SysUserInfo> queryByPassword(SysUserInfo query);
+
+    int deleteByPassword(@Crypto @Param("password") String password);
+
+    int updateByPassword(@Crypto @Param("newPassword") String newPassword, @Crypto @Param("oldPassword") String oldPassword);
+
+    int updateEntityByPassword(@Param("update") SysUserInfo update, @Crypto @Param("oldPassword") String oldPassword);
 }

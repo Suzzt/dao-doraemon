@@ -14,7 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author wuzhenhong
- * @date 2025/1/9 19:55
+ * @since 1.0
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = App.class)
@@ -24,7 +24,7 @@ public class SysUserServiceTest {
     private ISysUserInfoService sysUserInfoService;
 
     @Test
-    public void insert() {
+    public void insertToTestEncrypt() {
 
         SysUserInfo sysUserInfo = new SysUserInfo();
         sysUserInfo.setUserName("苏城锋");
@@ -42,7 +42,33 @@ public class SysUserServiceTest {
     }
 
     @Test
-    public void query() {
+    public void updateToTestEncrypt() {
+        SysUserInfo update = new SysUserInfo();
+        update.setId(1L);
+        update.setPassword("999");
+        sysUserInfoService.updateById(update);
+    }
+
+    @Test
+    public void updateByPasswordToTestEncrypt() {
+        sysUserInfoService.updateByPassword("101010","888");
+    }
+
+    @Test
+    public void updateEntityByPasswordToTestEncrypt() {
+        SysUserInfo update = new SysUserInfo();
+        update.setAvatar("sdfsdfsd");
+        update.setPassword("777");
+        sysUserInfoService.updateEntityByPassword(update,"888");
+    }
+
+    @Test
+    public void deleteToTestEncrypt() {
+        sysUserInfoService.deleteByPassword("888");
+    }
+
+    @Test
+    public void queryToTestDeCrypt() {
 
         SysUserInfo sysUserInfo = sysUserInfoService.lambdaQuery().eq(SysUserInfo::getAccount, "junmo")
                 .one();
@@ -51,7 +77,7 @@ public class SysUserServiceTest {
     }
 
     @Test
-    public void queryByPassword() {
+    public void queryByPasswordToTestEncryptAndDecrypt() {
         SysUserInfo query = new SysUserInfo();
         query.setPassword("888");
         List<SysUserInfo> sysUserInfos = sysUserInfoService.queryByPassword(query);
@@ -60,7 +86,7 @@ public class SysUserServiceTest {
     }
 
     @Test
-    public void mapper() {
+    public void mapperToTestEncrypt() {
 
         sysUserInfoService.updatePasswordByAccount("666", "junmo");
 
@@ -72,7 +98,7 @@ public class SysUserServiceTest {
 
 
     @Test
-    public void sqlSession() {
+    public void sqlSessionToTestEncrypt() {
 
         sysUserInfoService.updatePasswordByAccountSqlSession("888", "junmo");
 

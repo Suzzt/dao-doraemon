@@ -15,8 +15,8 @@ import org.dao.doraemon.database.crypto.annotated.Crypto;
  * 系统-用户信息
  * </p>
  *
- * @author author
- * @since 2024-05-13
+ * @author wuzhenhong
+ * @since 1.0
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

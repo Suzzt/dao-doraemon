@@ -8,7 +8,7 @@ import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import org.dao.doraemon.database.crypto.annotated.Crypto;
-import org.dao.doraemon.database.crypto.config.DefaultCryptStrategy;
+import org.dao.doraemon.database.crypto.config.DefaultCryptoServiceConfig;
 import org.dao.doraemon.database.crypto.server.DecryptService;
 import org.dao.doraemon.database.crypto.server.EncryptService;
 
@@ -55,10 +55,10 @@ public final class MetaObjectCryptoUtil {
         }
         Class<? extends EncryptService>[] encryptServerClass = enOrDecryptAnnotation.encryptClass();
         if (Objects.isNull(encryptServerClass) || encryptServerClass.length == 0) {
-            if (Objects.isNull(DefaultCryptStrategy.getDefaultEncrypt())) {
+            if (Objects.isNull(DefaultCryptoServiceConfig.getDefaultEncrypt())) {
                 throw new RuntimeException("默认加密策略不能设置为空！");
             } else {
-                encryptServerClass = new Class[]{DefaultCryptStrategy.getDefaultEncrypt()};
+                encryptServerClass = new Class[]{DefaultCryptoServiceConfig.getDefaultEncrypt()};
             }
         }
         String encryptedValue = value;
@@ -82,10 +82,10 @@ public final class MetaObjectCryptoUtil {
         }
         Class<? extends DecryptService>[] decryptServerClass = deCryptoAnnotation.decryptClass();
         if (Objects.isNull(decryptServerClass) || decryptServerClass.length == 0) {
-            if (Objects.isNull(DefaultCryptStrategy.getDefaultDecrypt())) {
+            if (Objects.isNull(DefaultCryptoServiceConfig.getDefaultDecrypt())) {
                 throw new RuntimeException("默认解密策略不能设置为空！");
             } else {
-                decryptServerClass = new Class[]{DefaultCryptStrategy.getDefaultDecrypt()};
+                decryptServerClass = new Class[]{DefaultCryptoServiceConfig.getDefaultDecrypt()};
             }
         }
         String decryptedValue = value;

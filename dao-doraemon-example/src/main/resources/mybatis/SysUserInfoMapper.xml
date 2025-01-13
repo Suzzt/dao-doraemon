@@ -20,9 +20,30 @@
     where account = #{account}
   </update>
 
+  <delete id="deleteByPassword">
+    delete
+    sys_user_info
+      where where password =
+    #{password}
+  </delete>
+
+  <update id="updateByPassword">
+    update sys_user_info
+    set password = #{newPassword}
+    where password = #{oldPassword}
+  </update>
+
+  <update id="updateEntityByPassword">
+    update sys_user_info
+    set password = #{update.password},
+        avatar   = #{update.avatar}
+    where password = #{oldPassword}
+  </update>
+
   <select id="queryByPassword" parameterType="org.dao.doraemon.example.database.dao.entity.SysUserInfo"
     resultType="org.dao.doraemon.example.database.dao.entity.SysUserInfo">
-
-    select * from sys_user_info where password = #{password}
+    select *
+    from sys_user_info
+    where password = #{password}
   </select>
 </mapper>

@@ -15,7 +15,7 @@ import org.springframework.util.ClassUtils;
  * @author wuzhenhong
  * @since 1.0
  */
-public class DefaultCryptStrategy {
+public class DefaultCryptoServiceConfig {
 
     private static final String CONFIG_NAME = "default_crypt.properties";
     private static final String DEFAULT_ENCRYPT_NAME = "defaultEncryptService";
@@ -34,7 +34,7 @@ public class DefaultCryptStrategy {
 
     public static void loadDefaultCrypto() {
         try {
-            URL url = DefaultCryptStrategy.class.getClassLoader().getResource(File.separator + CONFIG_NAME);
+            URL url = DefaultCryptoServiceConfig.class.getClassLoader().getResource(File.separator + CONFIG_NAME);
             if (Objects.nonNull(url)) {
                 Properties properties = new Properties();
                 properties.load(url.openStream());
@@ -42,7 +42,7 @@ public class DefaultCryptStrategy {
                 if (Objects.nonNull(encryptClassName) && !encryptClassName.trim().isEmpty()) {
                     try {
                         Class<?> defaultEntryClass = ClassUtils.forName(encryptClassName,
-                            DefaultCryptStrategy.class.getClassLoader());
+                            DefaultCryptoServiceConfig.class.getClassLoader());
                         if (!EncryptService.class.isAssignableFrom(defaultEntryClass)) {
                             throw new RuntimeException(String.format("className -> %s 未实现%s", encryptClassName,
                                 EncryptService.class.getName()));
@@ -56,7 +56,7 @@ public class DefaultCryptStrategy {
                 if (Objects.nonNull(decryptClassName) && !decryptClassName.trim().isEmpty()) {
                     try {
                         Class<?> defaultDecryClass = ClassUtils.forName(decryptClassName,
-                            DefaultCryptStrategy.class.getClassLoader());
+                            DefaultCryptoServiceConfig.class.getClassLoader());
                         if (!DecryptService.class.isAssignableFrom(defaultDecryClass)) {
                             throw new RuntimeException(String.format("className -> %s 未实现%s", decryptClassName,
                                 DecryptService.class.getName()));

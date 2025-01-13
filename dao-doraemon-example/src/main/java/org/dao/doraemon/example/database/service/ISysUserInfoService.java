@@ -9,8 +9,8 @@ import org.dao.doraemon.example.database.dao.entity.SysUserInfo;
  * 系统-用户信息 服务类
  * </p>
  *
- * @author author
- * @since 2024-05-13
+ * @author wuzhenhong
+ * @since 1.0
  */
 public interface ISysUserInfoService extends IService<SysUserInfo> {
 
@@ -18,4 +18,10 @@ public interface ISysUserInfoService extends IService<SysUserInfo> {
     int updatePasswordByAccountSqlSession(String password, String account);
 
     List<SysUserInfo> queryByPassword(SysUserInfo query);
+
+    int deleteByPassword(String password);
+
+    int updateByPassword(String newPassword, String oldPassword);
+
+    int updateEntityByPassword(SysUserInfo update, String oldPassword);
 }

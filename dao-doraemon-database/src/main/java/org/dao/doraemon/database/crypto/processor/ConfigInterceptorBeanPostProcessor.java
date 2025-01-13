@@ -2,7 +2,7 @@ package org.dao.doraemon.database.crypto.processor;
 
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.dao.doraemon.database.crypto.config.DefaultCryptStrategy;
+import org.dao.doraemon.database.crypto.config.DefaultCryptoServiceConfig;
 import org.dao.doraemon.database.crypto.interceptor.FieldDecryptInterceptor;
 import org.dao.doraemon.database.crypto.interceptor.FieldEncryptInterceptor;
 import org.springframework.beans.BeansException;
@@ -19,7 +19,7 @@ public class ConfigInterceptorBeanPostProcessor implements BeanPostProcessor {
         if (bean instanceof SqlSessionFactory) {
             // 会进入该方法的入口
             // org.springframework.beans.factory.support.FactoryBeanRegistrySupport.getObjectFromFactoryBean
-            DefaultCryptStrategy.loadDefaultCrypto();
+            DefaultCryptoServiceConfig.loadDefaultCrypto();
             SqlSessionFactory sqlSessionFactory = (SqlSessionFactory) bean;
             Configuration configuration = sqlSessionFactory.getConfiguration();
             FieldEncryptInterceptor fieldEncryptInterceptor = new FieldEncryptInterceptor();
