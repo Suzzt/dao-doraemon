@@ -18,8 +18,6 @@ import org.dao.doraemon.database.crypto.util.MetaObjectCryptoUtil;
 import org.dao.doraemon.database.crypto.util.ThreadLocalUtil;
 
 /**
- * insert与update时对数据加密
- *
  * @author wuzhenhong
  * @since 1.0
  */
