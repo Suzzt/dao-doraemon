@@ -2,6 +2,7 @@ package org.dao.doraemon.example.database.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.dao.doraemon.database.crypto.annotated.Crypto;
@@ -40,5 +41,10 @@ public class SysUserInfoServiceImpl extends ServiceImpl<SysUserInfoMapper, SysUs
         int row =  sqlSessionFactory.openSession().update(SysUserInfoMapper.class.getName() + ".updatePasswordByAccount",
             param);
         return row;
+    }
+
+    @Override
+    public List<SysUserInfo> queryByPassword(SysUserInfo query) {
+        return super.baseMapper.queryByPassword(query);
     }
 }

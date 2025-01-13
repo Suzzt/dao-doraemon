@@ -16,7 +16,13 @@
 
   <update id="updatePasswordByAccount">
     update sys_user_info
-      set password = #{password}
+    set password = #{password}
     where account = #{account}
   </update>
+
+  <select id="queryByPassword" parameterType="org.dao.doraemon.example.database.dao.entity.SysUserInfo"
+    resultType="org.dao.doraemon.example.database.dao.entity.SysUserInfo">
+
+    select * from sys_user_info where password = #{password}
+  </select>
 </mapper>

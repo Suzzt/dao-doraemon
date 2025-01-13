@@ -1,6 +1,7 @@
 package org.dao.doraemon.example.database.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import java.util.List;
 import org.dao.doraemon.example.database.dao.entity.SysUserInfo;
 
 /**
@@ -15,4 +16,6 @@ public interface ISysUserInfoService extends IService<SysUserInfo> {
 
     int updatePasswordByAccount(String password, String account);
     int updatePasswordByAccountSqlSession(String password, String account);
+
+    List<SysUserInfo> queryByPassword(SysUserInfo query);
 }

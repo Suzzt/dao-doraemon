@@ -2,7 +2,7 @@ package org.dao.doraemon.example.database.test;
 
 import cn.hutool.json.JSONUtil;
 import java.time.LocalDateTime;
-import org.apache.ibatis.session.SqlSessionFactory;
+import java.util.List;
 import org.dao.doraemon.example.database.App;
 import org.dao.doraemon.example.database.dao.entity.SysUserInfo;
 import org.dao.doraemon.example.database.service.ISysUserInfoService;
@@ -48,6 +48,15 @@ public class SysUserServiceTest {
                 .one();
 
         System.out.println(JSONUtil.toJsonStr(sysUserInfo));
+    }
+
+    @Test
+    public void queryByPassword() {
+        SysUserInfo query = new SysUserInfo();
+        query.setPassword("888");
+        List<SysUserInfo> sysUserInfos = sysUserInfoService.queryByPassword(query);
+
+        System.out.println(JSONUtil.toJsonStr(sysUserInfos));
     }
 
     @Test
