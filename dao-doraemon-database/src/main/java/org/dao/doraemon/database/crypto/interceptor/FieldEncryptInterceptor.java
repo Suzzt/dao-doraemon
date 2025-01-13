@@ -7,17 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
-import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
-import org.apache.ibatis.reflection.MetaObject;
 import org.dao.doraemon.database.crypto.annotated.Crypto;
 import org.dao.doraemon.database.crypto.bo.FieldEncryptSnapshot;
-import org.dao.doraemon.database.crypto.constant.MybatisFieldNameCons;
 import org.dao.doraemon.database.crypto.util.FieldReflectorUtil;
 import org.dao.doraemon.database.crypto.util.MetaObjectCryptoUtil;
 import org.dao.doraemon.database.crypto.util.ThreadLocalUtil;
@@ -35,20 +30,13 @@ public class FieldEncryptInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         ParameterHandler parameterHandler = (ParameterHandler) invocation.getTarget();
-        MetaObject metaObject = MetaObjectCryptoUtil.forObject(parameterHandler);
-        MappedStatement mappedStatement = (MappedStatement) metaObject.getValue(MybatisFieldNameCons.MAPPED_STATEMENT);
-        SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
-        List<FieldEncryptSnapshot> infos = null;
-        // 只处理dml语句
-        if (SqlCommandType.INSERT == sqlCommandType ||
-            SqlCommandType.UPDATE == sqlCommandType) {
-            Object parameter = parameterHandler.getParameterObject();
-            try {
-                this.execEncrypt(parameter);
-                infos = ThreadLocalUtil.get();
-            } finally {
-                ThreadLocalUtil.remove();
-            }
+        Object parameter = parameterHandler.getParameterObject();
+        List<FieldEncryptSnapshot> infos;
+        try {
+            this.execEncrypt(parameter);
+            infos = ThreadLocalUtil.get();
+        } finally {
+            ThreadLocalUtil.remove();
         }
         Object returnVal = invocation.proceed();
         if (Objects.nonNull(infos) && !infos.isEmpty()) {
@@ -66,7 +54,7 @@ public class FieldEncryptInterceptor implements Interceptor {
         return returnVal;
     }
 
-    private void execEncrypt(Object parameter) throws IllegalAccessException {
+    private void execEncrypt(Object parameter) {
         if (Objects.isNull(parameter)) {
             return;
         }
