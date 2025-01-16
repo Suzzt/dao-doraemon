@@ -33,7 +33,7 @@ import java.util.Map;
                 executor = @ExecutorConfiguration(
                         isParallel = true
                 ),
-                errorImport = @ErrorImportConfiguration(
+                definitionError = @ErrorImportConfiguration(
                         isGenerateErrorFile = true,
                         errorColumnName = "Error Cause",
                         errorFileName = "ExcelImportFailedReport.xlsx"

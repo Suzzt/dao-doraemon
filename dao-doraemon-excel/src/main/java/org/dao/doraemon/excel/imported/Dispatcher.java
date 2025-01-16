@@ -65,7 +65,7 @@ public class Dispatcher implements BeanPostProcessor {
 
     private static ExcelImportWrapper getExcelImportWrapper(ExcelImport annotation, ImportHandler<?> importHandler) {
         ImportConfiguration configuration = annotation.configuration();
-        ErrorImportConfiguration errorImportConfiguration = configuration.errorImport();
+        ErrorImportConfiguration definitionError = configuration.definitionError();
         ExecutorConfiguration executorConfiguration = configuration.executor();
         ExcelImportProperties properties = new ExcelImportProperties();
         properties.setMaxRows(configuration.maxRows());
@@ -75,9 +75,9 @@ public class Dispatcher implements BeanPostProcessor {
         properties.setSkipRow(configuration.skipRow());
 
         ExcelImportErrorProperties errorProperties = new ExcelImportErrorProperties();
-        errorProperties.setIsGenerateErrorFile(errorImportConfiguration.isGenerateErrorFile());
-        errorProperties.setErrorFileName(errorImportConfiguration.errorFileName());
-        errorProperties.setErrorColumnName(errorImportConfiguration.errorColumnName());
+        errorProperties.setIsGenerateErrorFile(definitionError.isGenerateErrorFile());
+        errorProperties.setErrorFileName(definitionError.errorFileName());
+        errorProperties.setErrorColumnName(definitionError.errorColumnName());
         properties.setExcelImportErrorProperties(errorProperties);
 
         ExcelExecutorProperties executor = new ExcelExecutorProperties();
