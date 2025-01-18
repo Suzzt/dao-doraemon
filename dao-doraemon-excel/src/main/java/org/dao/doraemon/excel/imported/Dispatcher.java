@@ -63,7 +63,7 @@ public class Dispatcher implements BeanPostProcessor {
         return BeanPostProcessor.super.postProcessBeforeInitialization(bean, beanName);
     }
 
-    private static ExcelImportWrapper getExcelImportWrapper(ExcelImport annotation, ImportHandler<?> importHandler) {
+    private ExcelImportWrapper getExcelImportWrapper(ExcelImport annotation, ImportHandler<?> importHandler) {
         ImportConfiguration configuration = annotation.configuration();
         ErrorImportConfiguration definitionError = configuration.definitionError();
         ExecutorConfiguration executorConfiguration = configuration.executor();
