@@ -13,13 +13,13 @@ import java.net.UnknownHostException;
  */
 public interface ExcelStorageProcessor {
     /**
-     * 保存
+     * 保存提交文件
      *
      * @param fileName 下载时文件名
      * @param workbook Excel文件
      * @return 下载链接
      */
-    String submit(String fileName, Workbook workbook) throws UnknownHostException;
+    String submit(String fileName, Workbook workbook);
 
     /**
      * 获取下载文件
