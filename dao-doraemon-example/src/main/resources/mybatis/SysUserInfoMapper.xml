@@ -21,9 +21,9 @@
   </update>
 
   <delete id="deleteByPassword">
-    delete
+    delete from
     sys_user_info
-      where where password =
+      where password =
     #{password}
   </delete>
 
