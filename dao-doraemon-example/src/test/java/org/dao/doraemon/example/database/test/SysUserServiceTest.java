@@ -27,8 +27,8 @@ public class SysUserServiceTest {
     public void insertToTestEncrypt() {
 
         SysUserInfo sysUserInfo = new SysUserInfo();
-        sysUserInfo.setUserName("苏城锋");
-        sysUserInfo.setAccount("junmo");
+        sysUserInfo.setUserName("你大爷");
+        sysUserInfo.setAccount("nidaye");
         sysUserInfo.setPassword("123456");
         sysUserInfo.setAvatar("http://666.com");
         sysUserInfo.setCreateAt(LocalDateTime.now());
@@ -51,7 +51,7 @@ public class SysUserServiceTest {
 
     @Test
     public void updateByPasswordToTestEncrypt() {
-        sysUserInfoService.updateByPassword("101010","888");
+        sysUserInfoService.updateByPassword("101010","999");
     }
 
     @Test
@@ -59,12 +59,12 @@ public class SysUserServiceTest {
         SysUserInfo update = new SysUserInfo();
         update.setAvatar("sdfsdfsd");
         update.setPassword("777");
-        sysUserInfoService.updateEntityByPassword(update,"888");
+        sysUserInfoService.updateEntityByPassword(update,"101010");
     }
 
     @Test
     public void deleteToTestEncrypt() {
-        sysUserInfoService.deleteByPassword("888");
+        sysUserInfoService.deleteByPassword("777");
     }
 
     @Test
