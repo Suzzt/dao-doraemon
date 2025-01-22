@@ -38,7 +38,7 @@ public class FieldEncryptInterceptor implements Interceptor {
         }
         Object returnVal = invocation.proceed();
         if (Objects.nonNull(infos) && !infos.isEmpty()) {
-            infos.stream().forEach(info -> {
+            infos.forEach(info -> {
                 Field field = info.getField();
                 field.setAccessible(true);
                 try {
@@ -65,11 +65,11 @@ public class FieldEncryptInterceptor implements Interceptor {
                         return;
                     }
                 }
-                this.doGetEncryptVal(item, null);
+                this.doGetEncryptVal(item);
                 itemRepeatList.add(item);
             });
         } else {
-            this.doGetEncryptVal(parameter, null);
+            this.doGetEncryptVal(parameter);
         }
     }
 
@@ -83,7 +83,7 @@ public class FieldEncryptInterceptor implements Interceptor {
 
     private void doProcess(Object bean, List<Field> fieldList) {
 
-        fieldList.stream().forEach(field -> {
+        fieldList.forEach(field -> {
 
             field.setAccessible(true);
             try {
@@ -103,8 +103,8 @@ public class FieldEncryptInterceptor implements Interceptor {
         return this.doGetEncryptVal(fieldBean, field, parameter);
     }
 
-    private Object doGetEncryptVal(Object fieldBean, Field field) {
-        return this.doGetEncryptVal(fieldBean, field, null);
+    private void doGetEncryptVal(Object fieldBean) {
+        this.doGetEncryptVal(fieldBean, null, null);
     }
 
     private Object doGetEncryptVal(Object fieldBean, Field field, Object containBean) {
@@ -117,18 +117,16 @@ public class FieldEncryptInterceptor implements Interceptor {
         if (clazz.isArray()) {
             Object[] c = (Object[]) fieldBean;
             for (Object item : c) {
-                this.doGetEncryptVal(item, null);
+                this.doGetEncryptVal(item);
             }
         } else if (Iterable.class.isAssignableFrom(clazz)) {
             Iterable<?> c = (Iterable<?>) fieldBean;
             for (Object item : c) {
-                this.doGetEncryptVal(item, null);
+                this.doGetEncryptVal(item);
             }
         } else if (Map.class.isAssignableFrom(clazz)) {
             Map<?, ?> map = (Map<?, ?>) fieldBean;
-            map.values().stream().forEach(item -> {
-                this.doGetEncryptVal(item, null);
-            });
+            map.values().forEach(this::doGetEncryptVal);
         } else if (String.class.isAssignableFrom(clazz)) {
             return this.encryptNess((String) fieldBean, field, containBean);
         } else {

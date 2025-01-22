@@ -44,7 +44,8 @@ public class ConfigMapperBeanPostProcessor implements BeanPostProcessor, Applica
             return bean;
         }
         // 获取 MapperFactoryBean 对象
-        MapperFactoryBean mapperFactoryBean = this.applicationContext.getBean(factoryBeanName, MapperFactoryBean.class);
+        MapperFactoryBean<?> mapperFactoryBean = this.applicationContext.getBean(factoryBeanName,
+            MapperFactoryBean.class);
         Class<?> mapperInterface = mapperFactoryBean.getObjectType();
         return Proxy.newProxyInstance(bean.getClass().getClassLoader(), new Class[]{mapperInterface},
             (proxy, method, args) -> {
@@ -55,9 +56,7 @@ public class ConfigMapperBeanPostProcessor implements BeanPostProcessor, Applica
                         Crypto enOrDecrypt = parameter.getAnnotation(Crypto.class);
                         Object value = args[index];
                         if (Objects.nonNull(enOrDecrypt) && value instanceof String) {
-                            if (Objects.nonNull(value)) {
-                                args[index] = MetaObjectCryptoUtil.encryptNess(enOrDecrypt, (String) value);
-                            }
+                            args[index] = MetaObjectCryptoUtil.encryptNess(enOrDecrypt, (String) value);
 
                         }
                         index++;

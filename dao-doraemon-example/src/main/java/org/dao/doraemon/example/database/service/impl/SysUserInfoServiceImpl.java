@@ -38,7 +38,7 @@ public class SysUserInfoServiceImpl extends ServiceImpl<SysUserInfoMapper, SysUs
         Map<String, Object> param = new HashMap<>();
         param.put("password", password);
         param.put("account", account);
-        int row =  sqlSessionFactory.openSession().update(SysUserInfoMapper.class.getName() + ".updatePasswordByAccount",
+        int row = sqlSessionFactory.openSession().update(SysUserInfoMapper.class.getName() + ".updatePasswordByAccount",
             param);
         return row;
     }

@@ -52,7 +52,7 @@ public class FieldDecryptInterceptor implements Interceptor {
 
     private void doProcess(Object bean, List<Field> fieldList) {
 
-        fieldList.stream().forEach(field -> {
+        fieldList.forEach(field -> {
 
             field.setAccessible(true);
             try {
@@ -72,6 +72,9 @@ public class FieldDecryptInterceptor implements Interceptor {
         return this.doGetDecryptVal(fieldBean, field);
     }
 
+    private void doGetDecryptVal(Object fieldBean) {
+        this.doGetDecryptVal(fieldBean, null);
+    }
 
     private Object doGetDecryptVal(Object fieldBean, Field field) {
         if (Objects.isNull(fieldBean)) {
@@ -83,18 +86,16 @@ public class FieldDecryptInterceptor implements Interceptor {
         if (clazz.isArray()) {
             Object[] c = (Object[]) fieldBean;
             for (Object item : c) {
-                this.doGetDecryptVal(item, null);
+                this.doGetDecryptVal(item);
             }
         } else if (Iterable.class.isAssignableFrom(clazz)) {
             Iterable<?> c = (Iterable<?>) fieldBean;
             for (Object item : c) {
-                this.doGetDecryptVal(item, null);
+                this.doGetDecryptVal(item);
             }
         } else if (Map.class.isAssignableFrom(clazz)) {
             Map<?, ?> map = (Map<?, ?>) fieldBean;
-            map.values().stream().forEach(item -> {
-                this.doGetDecryptVal(item, null);
-            });
+            map.values().forEach(this::doGetDecryptVal);
         } else if (String.class.isAssignableFrom(clazz)) {
             return this.decryptNess((String) fieldBean, field);
         } else {
@@ -111,8 +112,7 @@ public class FieldDecryptInterceptor implements Interceptor {
         if (Objects.isNull(deCryptoAnnotation)) {
             return fieldBean;
         }
-        String decryptedValue = MetaObjectCryptoUtil.decryptNess(deCryptoAnnotation, fieldBean);
 
-        return decryptedValue;
+        return MetaObjectCryptoUtil.decryptNess(deCryptoAnnotation, fieldBean);
     }
 }

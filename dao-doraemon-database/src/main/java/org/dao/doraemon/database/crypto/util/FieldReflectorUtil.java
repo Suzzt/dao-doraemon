@@ -48,7 +48,7 @@ public final class FieldReflectorUtil {
             return;
         }
         Field[] fields = tClass.getDeclaredFields();
-        if (fields != null && fields.length > 0) {
+        if (fields.length > 0) {
             for (Field field : fields) {
                 if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
                     fieldList.add(field);
@@ -67,11 +67,8 @@ public final class FieldReflectorUtil {
         for (Class<?> searchType = clazz; Object.class != searchType && searchType != null;
             searchType = searchType.getSuperclass()) {
             Field[] fields = getDeclaredFields(searchType);
-            Field[] var5 = fields;
-            int var6 = fields.length;
 
-            for (int var7 = 0; var7 < var6; ++var7) {
-                Field field = var5[var7];
+            for (Field field : fields) {
                 if ((name == null || name.equals(field.getName())) && (type == null || type.equals(field.getType()))) {
                     return field;
                 }
@@ -83,8 +80,7 @@ public final class FieldReflectorUtil {
 
     private static Field[] getDeclaredFields(Class<?> clazz) {
         try {
-            Field[] result = clazz.getDeclaredFields();
-            return result;
+            return clazz.getDeclaredFields();
         } catch (Throwable var3) {
             throw new IllegalStateException(
                 "Failed to introspect Class [" + clazz.getName() + "] from ClassLoader [" + clazz.getClassLoader()

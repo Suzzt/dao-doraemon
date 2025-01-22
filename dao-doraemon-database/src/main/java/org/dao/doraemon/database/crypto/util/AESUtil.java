@@ -40,7 +40,7 @@ public final class AESUtil {
 
     // 解密:
     public static String decryptECB(String key, String input) throws GeneralSecurityException {
-        byte[] bytes = AESUtil.decryptECB(key128, Base64.getDecoder().decode(input));
+        byte[] bytes = AESUtil.decryptECB(key, Base64.getDecoder().decode(input));
         return new String(bytes, StandardCharsets.UTF_8);
     }
 

@@ -73,9 +73,6 @@ public final class MetaObjectCryptoUtil {
         if (Objects.isNull(value) || Objects.isNull(deCryptoAnnotation)) {
             return value;
         }
-        if (Objects.isNull(deCryptoAnnotation)) {
-            return value;
-        }
         boolean decrypt = deCryptoAnnotation.decrypt();
         if (!decrypt) {
             return value;

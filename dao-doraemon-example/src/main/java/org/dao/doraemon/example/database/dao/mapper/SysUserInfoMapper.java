@@ -22,7 +22,8 @@ public interface SysUserInfoMapper extends BaseMapper<SysUserInfo> {
 
     int deleteByPassword(@Crypto @Param("password") String password);
 
-    int updateByPassword(@Crypto @Param("newPassword") String newPassword, @Crypto @Param("oldPassword") String oldPassword);
+    int updateByPassword(@Crypto @Param("newPassword") String newPassword,
+        @Crypto @Param("oldPassword") String oldPassword);
 
     int updateEntityByPassword(@Param("update") SysUserInfo update, @Crypto @Param("oldPassword") String oldPassword);
 }

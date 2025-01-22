@@ -15,6 +15,7 @@ import org.dao.doraemon.example.database.dao.entity.SysUserInfo;
 public interface ISysUserInfoService extends IService<SysUserInfo> {
 
     int updatePasswordByAccount(String password, String account);
+
     int updatePasswordByAccountSqlSession(String password, String account);
 
     List<SysUserInfo> queryByPassword(SysUserInfo query);
