@@ -82,8 +82,8 @@ public class ExcelUtils {
             // 应用红色边框样式
             cell.setCellStyle(redBorderStyle);
             XSSFClientAnchor anchor = new XSSFClientAnchor();
-            anchor.setCol1(columnIndex+1);
-            anchor.setCol2(columnIndex+3);
+            anchor.setCol1(columnIndex + 1);
+            anchor.setCol2(columnIndex + 3);
             anchor.setRow1(rowIndex);
             anchor.setRow2(rowIndex + 1);
 
@@ -99,8 +99,8 @@ public class ExcelUtils {
     /**
      * 创建红色边框样式的单元格
      *
-     * @param workbook
-     * @return
+     * @param workbook workbook
+     * @return 构建红色边框样式的单元格
      */
     private static CellStyle createRedBorderStyle(Workbook workbook) {
         CellStyle redBorderStyle = workbook.createCellStyle();

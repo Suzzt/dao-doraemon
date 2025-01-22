@@ -22,6 +22,7 @@ import org.dao.doraemon.excel.properties.ExcelImportProperties;
 import org.dao.doraemon.excel.server.ExcelImportResult;
 import org.dao.doraemon.excel.storage.ExcelStorageProcessor;
 import org.dao.doraemon.excel.wrapper.ExcelImportWrapper;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.util.StringUtils;
@@ -52,7 +53,7 @@ public class Dispatcher implements BeanPostProcessor {
     }
 
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessBeforeInitialization(Object bean, @NotNull String beanName) throws BeansException {
         Class<?> beanClass = bean.getClass();
         if (beanClass.isAnnotationPresent(ExcelImport.class)) {
             ExcelImport annotation = beanClass.getAnnotation(ExcelImport.class);
@@ -63,9 +64,9 @@ public class Dispatcher implements BeanPostProcessor {
         return BeanPostProcessor.super.postProcessBeforeInitialization(bean, beanName);
     }
 
-    private static ExcelImportWrapper getExcelImportWrapper(ExcelImport annotation, ImportHandler<?> importHandler) {
+    private ExcelImportWrapper getExcelImportWrapper(ExcelImport annotation, ImportHandler<?> importHandler) {
         ImportConfiguration configuration = annotation.configuration();
-        ErrorImportConfiguration errorImportConfiguration = configuration.errorImport();
+        ErrorImportConfiguration definitionError = configuration.definitionError();
         ExecutorConfiguration executorConfiguration = configuration.executor();
         ExcelImportProperties properties = new ExcelImportProperties();
         properties.setMaxRows(configuration.maxRows());
@@ -75,9 +76,9 @@ public class Dispatcher implements BeanPostProcessor {
         properties.setSkipRow(configuration.skipRow());
 
         ExcelImportErrorProperties errorProperties = new ExcelImportErrorProperties();
-        errorProperties.setIsGenerateErrorFile(errorImportConfiguration.isGenerateErrorFile());
-        errorProperties.setErrorFileName(errorImportConfiguration.errorFileName());
-        errorProperties.setErrorColumnName(errorImportConfiguration.errorColumnName());
+        errorProperties.setIsGenerateErrorFile(definitionError.isGenerateErrorFile());
+        errorProperties.setErrorFileName(definitionError.errorFileName());
+        errorProperties.setErrorColumnName(definitionError.errorColumnName());
         properties.setExcelImportErrorProperties(errorProperties);
 
         ExcelExecutorProperties executor = new ExcelExecutorProperties();
@@ -101,7 +102,7 @@ public class Dispatcher implements BeanPostProcessor {
      */
     public ExcelImportResult execute(String code, String parameter, InputStream inputStream) throws IOException {
         ExcelImportWrapper excelImportWrapper = resource.get(code);
-        if(excelImportWrapper == null) {
+        if (excelImportWrapper == null) {
             throw new ExcelMarkException("Not found excel handler, check you code.");
         }
         ExcelImportProperties excelProperties = excelImportWrapper.getExcelImportProperties();
@@ -160,7 +161,8 @@ public class Dispatcher implements BeanPostProcessor {
 
                     // 上传错误文件
                     String failFileName = importHandler.defineFailFileName(parameter);
-                    if(!StringUtils.hasLength(failFileName)){
+                    failFileName = StringUtils.hasLength(failFileName) ? failFileName : errorProperties.getErrorFileName();
+                    if (!StringUtils.hasLength(failFileName)) {
                         failFileName = "ExcelFailedReport.xlsx";
                     }
                     String downloadUrl = storageProcessor.submit(new Snowflake(1, 1).nextId() + File.separator + failFileName, workbook);

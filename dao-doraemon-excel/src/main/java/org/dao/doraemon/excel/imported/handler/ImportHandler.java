@@ -1,6 +1,5 @@
 package org.dao.doraemon.excel.imported.handler;
 
-import com.alibaba.excel.context.AnalysisContext;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.dao.doraemon.excel.model.ImportBatchResultModel;
@@ -30,12 +29,11 @@ public interface ImportHandler<T> {
     /**
      * 处理你的业务
      *
-     * @param data             业务对象
+     * @param dataWrapper      业务包装对象
      * @param requestParameter 请求参数
-     * @param context          导入上下文(from easyexcel), 一般来说没用
      * @return 处理结果定义
      */
-    ImportResultModel process(T data, String requestParameter, AnalysisContext context);
+    ImportResultModel process(DataWrapper<T> dataWrapper, String requestParameter);
 
     /**
      * 批量处理你的业务

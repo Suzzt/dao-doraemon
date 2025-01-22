@@ -1,8 +1,7 @@
 package org.dao.doraemon.example.excel;
 
-import com.alibaba.excel.context.AnalysisContext;
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.dao.doraemon.core.utils.GsonUtils;
 import org.dao.doraemon.excel.annotation.ErrorImportConfiguration;
 import org.dao.doraemon.excel.annotation.ExcelImport;
 import org.dao.doraemon.excel.annotation.ExecutorConfiguration;
@@ -33,7 +32,7 @@ import java.util.Map;
                 executor = @ExecutorConfiguration(
                         isParallel = true
                 ),
-                errorImport = @ErrorImportConfiguration(
+                definitionError = @ErrorImportConfiguration(
                         isGenerateErrorFile = true,
                         errorColumnName = "Error Cause",
                         errorFileName = "ExcelImportFailedReport.xlsx"
@@ -45,13 +44,14 @@ public class UserBizExcelImportHandler extends AbstractDefaultImportHandler<User
 
     @Override
     public ImportResultModel checkHead(Map<Integer, String> headMap, String requestParameter) {
-        log.info("headMap={}", new Gson().toJson(headMap));
+        log.info("headMap={}", GsonUtils.toJson(headMap));
         return ImportResultModel.success();
     }
 
     @Override
-    public ImportResultModel process(UserEntity data, String requestParameter, AnalysisContext context) {
-        log.info("data={}", new Gson().toJson(data));
+    public ImportResultModel process(DataWrapper<UserEntity> dataWrapper, String requestParameter) {
+        log.info("dataWrapper={}", GsonUtils.toJson(dataWrapper));
+        UserEntity data = dataWrapper.getData();
         if (data.getAge() == null) {
             return ImportResultModel.success();
         }

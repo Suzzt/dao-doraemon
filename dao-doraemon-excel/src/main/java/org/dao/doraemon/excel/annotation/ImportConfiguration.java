@@ -46,5 +46,5 @@ public @interface ImportConfiguration {
     /**
      * 错误导入配置
      */
-    ErrorImportConfiguration errorImport() default @ErrorImportConfiguration;
+    ErrorImportConfiguration definitionError() default @ErrorImportConfiguration;
 }

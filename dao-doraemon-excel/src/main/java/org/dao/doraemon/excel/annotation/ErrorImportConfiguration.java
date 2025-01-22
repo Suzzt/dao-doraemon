@@ -25,5 +25,5 @@ public @interface ErrorImportConfiguration {
     /**
      * 根据链接下载错误文件名
      */
-    String errorFileName() default "ExcelImportFailedReport";
+    String errorFileName() default "ExcelFailedReport";
 }

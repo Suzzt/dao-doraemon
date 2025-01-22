@@ -166,9 +166,7 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
      * @param dataWrapper 单条数据
      */
     private void processOne(DataWrapper<T> dataWrapper) {
-        T entity = dataWrapper.getData();
-        ImportResultModel result = handler.process(entity, requestParameter, null);
-
+        ImportResultModel result = handler.process(dataWrapper, requestParameter);
         if (result.getStatus() != 0) {
             if (result.getStatus() == -1) {
                 failCollector.put(dataWrapper.getIndex(), result.getMessage());
