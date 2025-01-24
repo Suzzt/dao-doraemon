@@ -11,7 +11,6 @@ import org.dao.doraemon.excel.annotation.ExcelImport;
 import org.dao.doraemon.excel.annotation.ExecutorConfiguration;
 import org.dao.doraemon.excel.annotation.ImportConfiguration;
 import org.dao.doraemon.excel.exception.ExcelMarkException;
-import org.dao.doraemon.excel.imported.handler.AbstractDefaultImportHandler;
 import org.dao.doraemon.excel.imported.handler.ImportHandler;
 import org.dao.doraemon.excel.imported.listener.ExcelProcessListener;
 import org.dao.doraemon.excel.imported.resolver.ExcelUtils;
@@ -56,10 +55,12 @@ public class Dispatcher implements BeanPostProcessor {
     public Object postProcessBeforeInitialization(Object bean, @NotNull String beanName) throws BeansException {
         Class<?> beanClass = bean.getClass();
         if (beanClass.isAnnotationPresent(ExcelImport.class)) {
-            ExcelImport annotation = beanClass.getAnnotation(ExcelImport.class);
-            String code = annotation.code();
-            ExcelImportWrapper excelImportWrapper = getExcelImportWrapper(annotation, (AbstractDefaultImportHandler<?>) bean);
-            resource.put(code, excelImportWrapper);
+            ExcelImport excelImport = beanClass.getAnnotation(ExcelImport.class);
+            String code = excelImport.code();
+            if (bean instanceof ImportHandler) {
+                ExcelImportWrapper excelImportWrapper = getExcelImportWrapper(excelImport, (ImportHandler<?>) bean);
+                resource.put(code, excelImportWrapper);
+            }
         }
         return BeanPostProcessor.super.postProcessBeforeInitialization(bean, beanName);
     }
