@@ -8,7 +8,7 @@ import lombok.Setter;
  * 批量导入处理结果
  *
  * @author sucf
- * @since 2025/1/6 23:12
+ * @since 1.0
  */
 @Setter
 @Getter
