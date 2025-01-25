@@ -11,11 +11,11 @@
     <modules>
         <module>dao-doraemon-excel</module>
         <module>dao-doraemon-example</module>
-        <module>dao-doraemon-desensitization</module>
         <module>dao-doraemon-database</module>
         <module>dao-doraemon-log</module>
         <module>dao-doraemon-download-center</module>
         <module>dao-doraemon-core</module>
+        <module>dao-doraemon-sensitive</module>
     </modules>
 
     <properties>
