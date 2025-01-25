@@ -14,4 +14,18 @@ public class ApiResult<T> {
     private String message;
     private String code;
     private T data;
+
+    public ApiResult() {
+    }
+
+    public ApiResult(boolean success, String message, String code, T data) {
+        this.success = success;
+        this.message = message;
+        this.code = code;
+        this.data = data;
+    }
+
+    public static <T> ApiResult<T> success(T data) {
+        return new ApiResult<>(true, "success", "0000", data);
+    }
 }
