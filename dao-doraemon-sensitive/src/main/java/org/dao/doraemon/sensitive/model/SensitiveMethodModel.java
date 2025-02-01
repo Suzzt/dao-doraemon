@@ -10,11 +10,11 @@ import java.util.Objects;
  * @since 1.0
  */
 @Data
-public class SensitiveModel {
+public class SensitiveMethodModel {
     private String fieldName;
-    private Handler handler ;
+    private Handler handler;
 
-    public SensitiveModel(String fieldName, Handler handler) {
+    public SensitiveMethodModel(String fieldName, Handler handler) {
         this.fieldName = fieldName;
         this.handler = handler;
     }
@@ -23,7 +23,7 @@ public class SensitiveModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SensitiveModel that = (SensitiveModel) o;
+        SensitiveMethodModel that = (SensitiveMethodModel) o;
         return Objects.equals(fieldName, that.fieldName);
     }
 

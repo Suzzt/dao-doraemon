@@ -1,10 +1,14 @@
-package org.dao.doraemon.sensitive.advice;
+package org.dao.doraemon.sensitive.drive;
 
+import cn.hutool.core.collection.CollUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.SneakyThrows;
+import org.dao.doraemon.core.utils.GsonUtils;
+import org.dao.doraemon.sensitive.annotation.MultipleSensitive;
 import org.dao.doraemon.sensitive.annotation.SensitiveMapping;
-import org.dao.doraemon.sensitive.model.SensitiveModel;
+import org.dao.doraemon.sensitive.model.SensitiveFieldModel;
+import org.dao.doraemon.sensitive.model.SensitiveMethodModel;
 import org.dao.doraemon.sensitive.serializer.SensitiveSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +38,7 @@ public class SensitiveResponseAdvice implements ResponseBodyAdvice<Object>, Bean
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SensitiveResponseAdvice.class);
 
-    private final Map<Method, Set<SensitiveModel>> sensitiveModelMap = Maps.newHashMap();
+    private final Map<Method, Set<SensitiveMethodModel>> sensitiveMethodMap = Maps.newHashMap();
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
@@ -44,8 +48,19 @@ public class SensitiveResponseAdvice implements ResponseBodyAdvice<Object>, Bean
                 SensitiveMapping sensitiveMapping = method.getAnnotation(SensitiveMapping.class);
                 if (sensitiveMapping != null) {
                     try {
-                        Set<SensitiveModel> sensitiveModels = sensitiveModelMap.computeIfAbsent(method, k -> Sets.newHashSet());
-                        sensitiveModels.add(new SensitiveModel(sensitiveMapping.fieldName(), sensitiveMapping.handler().newInstance()));
+                        Set<SensitiveMethodModel> sensitiveMethodModels = sensitiveMethodMap.computeIfAbsent(method, k -> Sets.newHashSet());
+                        sensitiveMethodModels.add(new SensitiveMethodModel(sensitiveMapping.fieldName(), sensitiveMapping.handler().newInstance()));
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                MultipleSensitive multipleSensitive = method.getAnnotation(MultipleSensitive.class);
+                if (multipleSensitive != null) {
+                    try {
+                        Set<SensitiveMethodModel> sensitiveMethodModels = sensitiveMethodMap.computeIfAbsent(method, k -> Sets.newHashSet());
+                        for (SensitiveMapping mapping : multipleSensitive.value()) {
+                            sensitiveMethodModels.add(new SensitiveMethodModel(mapping.fieldName(), mapping.handler().newInstance()));
+                        }
                     } catch (InstantiationException | IllegalAccessException e) {
                         throw new RuntimeException(e);
                     }
@@ -65,10 +80,11 @@ public class SensitiveResponseAdvice implements ResponseBodyAdvice<Object>, Bean
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
                                   Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   ServerHttpRequest request, ServerHttpResponse response) {
-        Set<SensitiveModel> sensitiveModels = sensitiveModelMap.get(returnType.getMethod()) == null ? Sets.newHashSet() : sensitiveModelMap.get(returnType.getMethod());
-        sensitiveModels.addAll(FieldRetriever.parseSensitiveFields(body));
-        if (!sensitiveModels.isEmpty()) {
-            SensitiveSerializer.setSensitiveConfig(sensitiveModels);
+        Set<SensitiveMethodModel> sensitiveMethodModels = sensitiveMethodMap.get(returnType.getMethod()) == null ? Sets.newHashSet() : sensitiveMethodMap.get(returnType.getMethod());
+        Set<SensitiveFieldModel> sensitiveFieldModels = FieldRetriever.parseSensitiveFields(body);
+        if (CollUtil.isNotEmpty(sensitiveMethodModels) || CollUtil.isNotEmpty(sensitiveFieldModels)) {
+            LOGGER.info("返回值触发脱敏！脱敏前对象={}, 脱敏字段处理信息. method={}, field={}, class={}", GsonUtils.toJson(body), sensitiveMethodModels, sensitiveFieldModels);
+            SensitiveSerializer.setSensitiveConfig(sensitiveMethodModels, sensitiveFieldModels);
         }
         return body;
     }

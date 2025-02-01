@@ -1,13 +1,20 @@
 package org.dao.doraemon.sensitive;
 
-import org.dao.doraemon.sensitive.advice.SensitiveEliminateInterceptor;
-import org.dao.doraemon.sensitive.advice.SensitiveResponseAdvice;
+import org.dao.doraemon.sensitive.drive.SensitiveEliminateInterceptor;
+import org.dao.doraemon.sensitive.drive.SensitiveResponseAdvice;
+import org.dao.doraemon.sensitive.drive.SensitiveUtil;
+import org.dao.doraemon.sensitive.drive.data.CacheDerivator;
+import org.dao.doraemon.sensitive.drive.data.Derivator;
 import org.dao.doraemon.sensitive.serializer.SensitiveSerializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author sucf
@@ -21,6 +28,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * </p>
  */
 @Configuration
+@Import(SensitiveUtil.class)
 public class SensitiveAutoConfiguration implements WebMvcConfigurer {
 
     @Override
@@ -30,14 +38,20 @@ public class SensitiveAutoConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public SensitiveResponseAdvice sensitiveResponseAdvice(){
+    public SensitiveResponseAdvice sensitiveResponseAdvice() {
         return new SensitiveResponseAdvice();
     }
 
     @Bean
-    public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
+    @ConditionalOnMissingBean(Derivator.class)
+    public Derivator derivator() {
+        return new CacheDerivator(1000, 12, TimeUnit.HOURS);
+    }
+
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer(Derivator derivator) {
         return jacksonObjectMapperBuilder ->
                 jacksonObjectMapperBuilder
-                        .serializerByType(String.class, new SensitiveSerializer());
+                        .serializerByType(String.class, new SensitiveSerializer(derivator));
     }
 }

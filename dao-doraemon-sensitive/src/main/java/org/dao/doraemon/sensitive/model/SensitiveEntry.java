@@ -8,10 +8,10 @@ import lombok.Data;
  */
 @Data
 public class SensitiveEntry {
-    private Long key;
+    private String key;
     private String value;
 
-    public SensitiveEntry(Long key, String value) {
+    public SensitiveEntry(String key, String value) {
         this.key = key;
         this.value = value;
     }
