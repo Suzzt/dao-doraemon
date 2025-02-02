@@ -10,9 +10,10 @@ import java.lang.annotation.*;
  * @author sucf
  * @since 1.0
  * 作用范围: 在springmvc项目中返回值，可以用于VO返回对象的字段上, 也可以用于请求处理器的方法上返回值
- * 如果作用在复合类型的对象上, 自动向下找寻字段执行你的配置实现的脱敏处理器处理逻辑
+ * 如果作用在对象上, 自动向下找寻字段执行你的配置实现的脱敏处理器处理逻辑.
+ * 如果作用在字段上, 自动向下找寻字段执行你的配置实现的脱敏处理器处理逻辑.
  */
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface SensitiveMapping {

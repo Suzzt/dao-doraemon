@@ -11,10 +11,10 @@ import org.dao.doraemon.sensitive.handler.PhoneNumberHandler;
  * @since 1.0
  */
 @Data
-public class UserAppleFieldMultipleVO {
-    @MultipleSensitive({
-            @SensitiveMapping(fieldName = "password", handler = PasswordHandler.class),
-            @SensitiveMapping(fieldName = "phone", handler = PhoneNumberHandler.class)
-    })
-    private UserVO userVO;
+@MultipleSensitive({
+        @SensitiveMapping(fieldName = "password", handler = PasswordHandler.class),
+        @SensitiveMapping(fieldName = "phone", handler = PhoneNumberHandler.class)
+})
+public class ClassMultipleVO {
+    private AppleVO appleVO;
 }

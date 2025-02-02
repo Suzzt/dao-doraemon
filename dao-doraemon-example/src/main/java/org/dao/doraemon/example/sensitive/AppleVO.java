@@ -7,7 +7,7 @@ import lombok.Data;
  * @since 1.0
  */
 @Data
-public class UserMultipleVO {
+public class AppleVO {
     private String name;
     private String password;
     private String phone;

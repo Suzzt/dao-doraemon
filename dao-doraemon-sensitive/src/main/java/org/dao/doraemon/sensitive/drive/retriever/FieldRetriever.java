@@ -1,4 +1,4 @@
-package org.dao.doraemon.sensitive.drive;
+package org.dao.doraemon.sensitive.drive.retriever;
 
 import org.dao.doraemon.sensitive.annotation.MultipleSensitive;
 import org.dao.doraemon.sensitive.annotation.SensitiveMapping;
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 public class FieldRetriever {
     private static final Logger LOGGER = Logger.getLogger(FieldRetriever.class.getName());
 
-    public static Set<SensitiveFieldModel> parseSensitiveFields(Object obj) {
+    public static Set<SensitiveFieldModel> parse(Object obj) {
         Set<SensitiveFieldModel> sensitiveFieldModels = new HashSet<>();
         if (obj != null) {
             parseObject(obj, sensitiveFieldModels, "", null, null);

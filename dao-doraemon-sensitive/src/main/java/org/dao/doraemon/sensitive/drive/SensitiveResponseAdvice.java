@@ -7,6 +7,9 @@ import lombok.SneakyThrows;
 import org.dao.doraemon.core.utils.GsonUtils;
 import org.dao.doraemon.sensitive.annotation.MultipleSensitive;
 import org.dao.doraemon.sensitive.annotation.SensitiveMapping;
+import org.dao.doraemon.sensitive.drive.retriever.ClassRetriever;
+import org.dao.doraemon.sensitive.drive.retriever.FieldRetriever;
+import org.dao.doraemon.sensitive.model.SensitiveClassModel;
 import org.dao.doraemon.sensitive.model.SensitiveFieldModel;
 import org.dao.doraemon.sensitive.model.SensitiveMethodModel;
 import org.dao.doraemon.sensitive.serializer.SensitiveSerializer;
@@ -81,10 +84,11 @@ public class SensitiveResponseAdvice implements ResponseBodyAdvice<Object>, Bean
                                   Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   ServerHttpRequest request, ServerHttpResponse response) {
         Set<SensitiveMethodModel> sensitiveMethodModels = sensitiveMethodMap.get(returnType.getMethod()) == null ? Sets.newHashSet() : sensitiveMethodMap.get(returnType.getMethod());
-        Set<SensitiveFieldModel> sensitiveFieldModels = FieldRetriever.parseSensitiveFields(body);
-        if (CollUtil.isNotEmpty(sensitiveMethodModels) || CollUtil.isNotEmpty(sensitiveFieldModels)) {
-            LOGGER.info("返回值触发脱敏！脱敏前对象={}, 脱敏字段处理信息. method={}, field={}, class={}", GsonUtils.toJson(body), sensitiveMethodModels, sensitiveFieldModels);
-            SensitiveSerializer.setSensitiveConfig(sensitiveMethodModels, sensitiveFieldModels);
+        Set<SensitiveFieldModel> sensitiveFieldModels = FieldRetriever.parse(body);
+        Set<SensitiveClassModel> sensitiveClassModels = ClassRetriever.parse(body);
+        if (CollUtil.isNotEmpty(sensitiveMethodModels) || CollUtil.isNotEmpty(sensitiveFieldModels) || CollUtil.isNotEmpty(sensitiveClassModels)) {
+            LOGGER.info("返回值触发脱敏！脱敏前对象={}, 脱敏字段处理信息. method={}, field={}, class={}", GsonUtils.toJson(body), sensitiveMethodModels, sensitiveFieldModels, sensitiveClassModels);
+            SensitiveSerializer.setSensitiveConfig(sensitiveMethodModels, sensitiveFieldModels, sensitiveClassModels);
         }
         return body;
     }

@@ -18,59 +18,79 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("sensitive")
 public class SensitiveController {
-    @RequestMapping("query_user")
+    @RequestMapping("apple_method")
     @SensitiveMapping(fieldName = "password", handler = PasswordHandler.class)
-    public ApiResult<UserVO> queryUser1() {
-        // mock data
-        UserVO userVO = new UserVO();
-        userVO.setEmail("wuu@163.com");
-        userVO.setName("JunMo");
-        userVO.setPassword("123456");
-        userVO.setPhone("19822222222");
-        userVO.setAddress("beijing");
-        return ApiResult.success(userVO);
+    public ApiResult<AppleMethodVO> appleMethod() {
+        AppleMethodVO appleMethodVO = new AppleMethodVO();
+        appleMethodVO.setEmail("wuu@163.com");
+        appleMethodVO.setName("JunMo");
+        appleMethodVO.setPassword("123456");
+        appleMethodVO.setPhone("19822222222");
+        appleMethodVO.setAddress("beijing");
+        return ApiResult.success(appleMethodVO);
     }
 
-    @RequestMapping("query_user_apple_field")
-    public ApiResult<UserAppleFieldVO> queryUser2() {
-        // mock data
-        UserAppleFieldVO userVO = new UserAppleFieldVO();
-        userVO.setEmail("wuu@163.com");
-        userVO.setName("JunMo");
-        userVO.setPassword("123456");
-        userVO.setPhone("19822222222");
-        userVO.setAddress("beijing");
-        return ApiResult.success(userVO);
+    @RequestMapping("apple_field")
+    public ApiResult<AppleFieldVO> appleField() {
+        AppleFieldVO appleFieldVO = new AppleFieldVO();
+        appleFieldVO.setEmail("wuu@163.com");
+        appleFieldVO.setName("JunMo");
+        appleFieldVO.setPassword("123456");
+        appleFieldVO.setPhone("19822222222");
+        appleFieldVO.setAddress("beijing");
+        return ApiResult.success(appleFieldVO);
     }
 
-    @RequestMapping("query_user_multiple")
+    @RequestMapping("apple_class")
+    public ApiResult<AppleClassVO> appleClass() {
+        AppleClassVO appleClassVO = new AppleClassVO();
+        appleClassVO.setEmail("wuu@163.com");
+        appleClassVO.setName("JunMo");
+        appleClassVO.setPassword("123456");
+        appleClassVO.setPhone("19822222222");
+        appleClassVO.setAddress("beijing");
+        return ApiResult.success(appleClassVO);
+    }
+
+    @RequestMapping("multiple_apple_method")
     @MultipleSensitive({
             @SensitiveMapping(fieldName = "password", handler = PasswordHandler.class),
             @SensitiveMapping(fieldName = "phone", handler = PhoneNumberHandler.class)
     })
-    public ApiResult<UserMultipleVO> queryUserMultiple1() {
-        // mock data
-        UserMultipleVO userVO = new UserMultipleVO();
-        userVO.setEmail("wuu@163.com");
-        userVO.setName("JunMo");
-        userVO.setPassword("123456");
-        userVO.setPhone("19822222222");
-        userVO.setAddress("beijing");
-        return ApiResult.success(userVO);
+    public ApiResult<AppleMethodVO> multipleAppleMethod() {
+        AppleMethodVO appleMethodVO = new AppleMethodVO();
+        appleMethodVO.setEmail("wuu@163.com");
+        appleMethodVO.setName("JunMo");
+        appleMethodVO.setPassword("123456");
+        appleMethodVO.setPhone("19822222222");
+        appleMethodVO.setAddress("beijing");
+        return ApiResult.success(appleMethodVO);
     }
 
-    @RequestMapping("query_user_multiple_apple_field")
-    public ApiResult<UserAppleFieldMultipleVO> queryUserMultiple2() {
-        // mock data
-        UserVO userVO = new UserVO();
-        userVO.setEmail("wuu@163.com");
-        userVO.setName("JunMo");
-        userVO.setPassword("123456");
-        userVO.setPhone("19822222222");
-        userVO.setAddress("beijing");
-        UserAppleFieldMultipleVO userAppleFieldMultipleVO = new UserAppleFieldMultipleVO();
-        userAppleFieldMultipleVO.setUserVO(userVO);
-        return ApiResult.success(userAppleFieldMultipleVO);
+    @RequestMapping("multiple_apple_field")
+    public ApiResult<FieldMultipleVO> multipleAppleField() {
+        AppleVO appleVO = new AppleVO();
+        appleVO.setEmail("wuu@163.com");
+        appleVO.setName("JunMo");
+        appleVO.setPassword("123456");
+        appleVO.setPhone("19822222222");
+        appleVO.setAddress("beijing");
+        FieldMultipleVO fieldMultipleVO = new FieldMultipleVO();
+        fieldMultipleVO.setAppleVO(appleVO);
+        return ApiResult.success(fieldMultipleVO);
+    }
+
+    @RequestMapping("multiple_apple_class")
+    public ApiResult<ClassMultipleVO> multipleAppleClass() {
+        AppleVO appleVO = new AppleVO();
+        appleVO.setEmail("wuu@163.com");
+        appleVO.setName("JunMo");
+        appleVO.setPassword("123456");
+        appleVO.setPhone("19822222222");
+        appleVO.setAddress("beijing");
+        ClassMultipleVO classMultipleVO = new ClassMultipleVO();
+        classMultipleVO.setAppleVO(appleVO);
+        return ApiResult.success(classMultipleVO);
     }
 
     @RequestMapping("data")

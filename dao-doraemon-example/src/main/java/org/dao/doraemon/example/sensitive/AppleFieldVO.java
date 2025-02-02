@@ -9,7 +9,7 @@ import org.dao.doraemon.sensitive.handler.PasswordHandler;
  * @since 1.0
  */
 @Data
-public class UserAppleFieldVO {
+public class AppleFieldVO {
     private String name;
     @SensitiveMapping(fieldName = "password", handler = PasswordHandler.class)
     private String password;
