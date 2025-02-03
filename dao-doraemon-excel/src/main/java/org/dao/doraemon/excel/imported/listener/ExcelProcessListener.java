@@ -37,11 +37,11 @@ public class ExcelProcessListener<T> extends AnalysisEventListener<T> {
     private final String requestParameter;
     private final BitSet skipRowBitSet;
 
-    private final List<DataWrapper<T>> dataCollector = new ArrayList<>();
+    private final List<DataWrapper<T>> dataCollector = new CopyOnWriteArrayList<>();
     @Getter
-    private final Map<Integer, String> failCollector = new HashMap<>();
+    private final Map<Integer, String> failCollector = new ConcurrentHashMap<>();
     @Getter
-    private final List<CommentModel> commentCollector = new ArrayList<>();
+    private final List<CommentModel> commentCollector = new CopyOnWriteArrayList<>();
 
     @Getter
     private int totalRows = 0;
