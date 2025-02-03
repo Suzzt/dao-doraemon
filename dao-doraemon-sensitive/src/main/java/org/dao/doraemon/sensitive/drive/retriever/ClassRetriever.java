@@ -29,7 +29,7 @@ public class ClassRetriever {
 
         // 合并处理规则：当前类注解 + 父级规则（父级规则可能被覆盖）
         Map<String, Class<? extends Handler>> currentHandlers = new HashMap<>(parentHandlers);
-        currentHandlers.putAll(parseClassAnnotations(obj.getClass(), parentPath));
+        currentHandlers.putAll(parseClassAnnotations(obj.getClass()));
 
         for (Field field : getAllFields(obj.getClass())) {
             try {
@@ -41,7 +41,7 @@ public class ClassRetriever {
                 String currentPath = parentPath.isEmpty() ? fieldName : parentPath + "." + fieldName;
 
                 // 处理字段上的注解（最高优先级）
-                Map<String, Class<? extends Handler>> fieldHandlers = parseFieldAnnotations(field, currentPath);
+                Map<String, Class<? extends Handler>> fieldHandlers = parseFieldAnnotations(field);
                 currentHandlers.putAll(fieldHandlers);
 
                 // 检查是否匹配处理规则
@@ -62,7 +62,7 @@ public class ClassRetriever {
         return results;
     }
 
-    private static Map<String, Class<? extends Handler>> parseClassAnnotations(Class<?> clazz, String basePath) {
+    private static Map<String, Class<? extends Handler>> parseClassAnnotations(Class<?> clazz) {
         Map<String, Class<? extends Handler>> handlers = new HashMap<>();
 
         // 处理类级别注解
@@ -81,7 +81,7 @@ public class ClassRetriever {
         return handlers;
     }
 
-    private static Map<String, Class<? extends Handler>> parseFieldAnnotations(Field field, String basePath) {
+    private static Map<String, Class<? extends Handler>> parseFieldAnnotations(Field field) {
         Map<String, Class<? extends Handler>> handlers = new HashMap<>();
 
         // 处理字段级别注解
