@@ -9,12 +9,26 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dao-doraemon-desensitization</artifactId>
+    <artifactId>dao-doraemon-sensitive</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.dao.doraemon</groupId>
+            <artifactId>dao-doraemon-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+    </dependencies>
 
 </project>

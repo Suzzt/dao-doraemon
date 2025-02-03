@@ -6,7 +6,7 @@ import lombok.Data;
  * Excel 文件导入返回结构
  *
  * @author sucf
- * @create_time 2024/12/26 20:05
+ * @since 1.0
  */
 @Data
 public class ExcelImportResult {
@@ -19,6 +19,11 @@ public class ExcelImportResult {
      * 处理成功数量
      */
     private Integer successCount;
+
+    /**
+     * 跳过总数量
+     */
+    private Integer skipCount;
 
     /**
      * 导入内容总数(去掉跳过数量+从表头后开始计算)
