@@ -26,6 +26,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
+            <scope>provided</scope>
             <version>3.3.2</version>
         </dependency>
         <dependency>

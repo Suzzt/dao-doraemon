@@ -5,6 +5,7 @@ import org.dao.doraemon.excel.imported.Dispatcher;
 import org.dao.doraemon.excel.server.ExcelHttpServer;
 import org.dao.doraemon.excel.storage.ExcelStorageProcessor;
 import org.dao.doraemon.excel.storage.LocalExcelStorageProcessor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +46,7 @@ public class ExcelAutoConfiguration implements EnvironmentAware {
     }
 
     @Override
-    public void setEnvironment(Environment environment) {
+    public void setEnvironment(@NotNull Environment environment) {
         this.environment = environment;
     }
 }

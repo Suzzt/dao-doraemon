@@ -23,6 +23,13 @@
       <artifactId>dao-doraemon-excel</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.dao.doraemon</groupId>
+      <artifactId>dao-doraemon-sensitive</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    
     <dependency>
       <groupId>org.dao.doraemon</groupId>
       <artifactId>dao-doraemon-database</artifactId>
@@ -80,4 +87,5 @@
     </dependency>
 
   </dependencies>
+
 </project>

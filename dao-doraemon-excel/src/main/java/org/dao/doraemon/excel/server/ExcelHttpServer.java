@@ -19,7 +19,7 @@ import java.net.URLEncoder;
  * 提供 http 服务接口
  *
  * @author sucf
- * @since 2024/12/26 20:01
+ * @since 1.0
  */
 @RestController
 @RequestMapping("excel")
@@ -37,7 +37,7 @@ public class ExcelHttpServer {
     @RequestMapping(value = "import", method = RequestMethod.POST)
     public ApiResult<ExcelImportResult> importExcel(@RequestParam("file") MultipartFile file, @RequestParam("code") String code, @RequestParam(value = "param", required = false) String param) {
         ApiResult<ExcelImportResult> apiResult = new ApiResult<>();
-        if (file == null) {
+        if (file == null || file.isEmpty()) {
             apiResult.setSuccess(false);
             apiResult.setMessage("The file cannot be empty!");
             return apiResult;

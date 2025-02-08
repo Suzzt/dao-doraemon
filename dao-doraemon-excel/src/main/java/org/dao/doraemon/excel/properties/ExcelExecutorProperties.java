@@ -8,7 +8,7 @@ import lombok.Data;
  * 执行配置
  *
  * @author sucf
- * @since 2025/1/8 20:53
+ * @since 1.0
  */
 @Data
 public class ExcelExecutorProperties {

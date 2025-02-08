@@ -6,7 +6,7 @@ import java.lang.annotation.*;
  * 执行器配置
  *
  * @author sucf
- * @since 2025/1/8 20:51
+ * @since 1.0
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
