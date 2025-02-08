@@ -1,8 +1,17 @@
 package org.dao.doraemon.excel;
 
+import com.alibaba.excel.util.StringUtils;
+import org.dao.doraemon.excel.imported.Dispatcher;
 import org.dao.doraemon.excel.server.ExcelHttpServer;
+import org.dao.doraemon.excel.storage.ExcelStorageProcessor;
+import org.dao.doraemon.excel.storage.LocalExcelStorageProcessor;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 
 /**
  * Auto-Configuration for Excel.
@@ -14,14 +23,30 @@ import org.springframework.context.annotation.Configuration;
  * 4.统一的服务接口暴露提供入口.
  *
  * @author sucf
- * @create_time 2024/12/26 13:48
+ * @since 1.0
  * @see ExcelHttpServer
  */
 @Configuration
-public class ExcelAutoConfiguration {
+@Import(Dispatcher.class)
+public class ExcelAutoConfiguration implements EnvironmentAware {
+
+    private Environment environment;
+
     @Bean
-    public ExcelHttpServer excelHttpServer() {
-        return new ExcelHttpServer();
+    public ExcelHttpServer excelHttpServer(Dispatcher dispatcher) {
+        return new ExcelHttpServer(dispatcher);
     }
 
+    @Bean
+    @ConditionalOnMissingBean(ExcelStorageProcessor.class)
+    public ExcelStorageProcessor excelStorageProcessor() {
+        String localPath  = environment.getProperty("dao_doraemon.excel.storage.local_path");
+        localPath = StringUtils.isBlank(localPath) ? "/data/excel/storage/" : localPath;
+        return new LocalExcelStorageProcessor(localPath);
+    }
+
+    @Override
+    public void setEnvironment(@NotNull Environment environment) {
+        this.environment = environment;
+    }
 }
