@@ -1,12 +1,5 @@
 package org.dao.doraemon.sensitive.drive.data;
 
-/**
- * 缓存
- *
- * @author sucf
- * @since 1.0
- */
-
 import cn.hutool.core.lang.Snowflake;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
