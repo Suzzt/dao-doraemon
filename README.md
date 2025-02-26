@@ -1,4 +1,6 @@
-![1](https://github.com/user-attachments/assets/81bfaf1c-37d0-46f3-b684-91484c99fb0e)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/81bfaf1c-37d0-46f3-b684-91484c99fb0e" width="300"/>
+</p>
 
 ![Java](https://img.shields.io/badge/Java-8+-orange?logo=openjdk)
 ![License](https://img.shields.io/github/license/Suzzt/dao-doraemon)
