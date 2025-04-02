@@ -13,10 +13,6 @@ server:
   error:
     path: /system/error
 
-mybatis-plus:
-  mapper-locations: classpath*:/mybatis/*.xml
-  config-location: classpath:mybatis-config.xml
-
 spring:
   servlet:
     multipart:
@@ -30,28 +26,3 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
     default-property-inclusion: NON_NULL
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    type: com.alibaba.druid.pool.DruidDataSource
-    druid:
-      stat-view-servlet.enabled: false
-      web-stat-filter.enabled: false
-      filters: stat
-      maxActive: 20
-      initialSize: 1
-      maxWait: 60000
-      minIdle: 1
-      timeBetweenEvictionRunsMillis: 60000
-      minEvictableIdleTimeMillis: 300000
-      validationQuery: select 'x'
-      testWhileIdle: true
-      testOnBorrow: false
-      testOnReturn: false
-      poolPreparedStatements: true
-      maxPoolPreparedStatementPerConnectionSize: 20
-      maxOpenPreparedStatements: 20
-      useGlobalDataSourceStat: false
-      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=1000;druid.stat.logSlowSql=true
-      url: jdbc:mysql://127.0.0.1:3306/crypto_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
-      username: root
-      password: lx_doc_test
