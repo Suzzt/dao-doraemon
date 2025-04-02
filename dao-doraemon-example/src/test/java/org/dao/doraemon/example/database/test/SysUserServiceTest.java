@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @since 1.0
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(value = {"spring.profiles.active=database"},classes = App.class)
+@SpringBootTest(classes = App.class)
 public class SysUserServiceTest {
 
     @Autowired
