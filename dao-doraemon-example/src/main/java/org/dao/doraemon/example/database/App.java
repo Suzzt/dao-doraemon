@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class App {
 
     public static void main(String[] args) {
+        System.setProperty("spring.profiles.active", "database");
         SpringApplication.run(App.class, args);
     }
 }
