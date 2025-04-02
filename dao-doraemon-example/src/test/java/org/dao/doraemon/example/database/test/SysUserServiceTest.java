@@ -1,7 +1,6 @@
 package org.dao.doraemon.example.database.test;
 
 import cn.hutool.json.JSONUtil;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.dao.doraemon.example.database.App;
 import org.dao.doraemon.example.database.dao.entity.SysUserInfo;
@@ -31,9 +30,7 @@ public class SysUserServiceTest {
         sysUserInfo.setAccount("nidaye");
         sysUserInfo.setPassword("123456");
         sysUserInfo.setAvatar("http://666.com");
-        sysUserInfo.setCreateAt(LocalDateTime.now());
         sysUserInfo.setVersion(0);
-        sysUserInfo.setUpdateAt(LocalDateTime.now());
         sysUserInfo.setStatus(0);
 
         sysUserInfoService.save(sysUserInfo);

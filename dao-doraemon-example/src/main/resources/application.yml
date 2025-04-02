@@ -1,7 +1,7 @@
 dao_doraemon:
   excel:
     storage:
-      local_path: /Users/sucf/Downloads/excel/
+      local_path: /data/excel/
 server:
   port: 8080
   servlet:
@@ -12,10 +12,6 @@ server:
       min-spare: 10 # Minimum amount of worker threads.
   error:
     path: /system/error
-
-mybatis-plus:
-  mapper-locations: classpath*:/mybatis/*.xml
-  config-location: classpath:mybatis-config.xml
 
 spring:
   servlet:
@@ -38,7 +34,7 @@ spring:
       web-stat-filter.enabled: false
       filters: stat
       maxActive: 20
-      initialSize: 1
+      initialSize: 0
       maxWait: 60000
       minIdle: 1
       timeBetweenEvictionRunsMillis: 60000
@@ -55,3 +51,7 @@ spring:
       url: jdbc:mysql://127.0.0.1:3306/crypto_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
       username: root
       password: lx_doc_test
+
+mybatis-plus:
+  mapper-locations: classpath*:/mybatis/*.xml
+  config-location: classpath:mybatis-config.xml
