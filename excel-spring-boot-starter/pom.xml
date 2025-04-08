@@ -6,22 +6,21 @@
     <parent>
         <groupId>org.dao.doraemon</groupId>
         <artifactId>parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
-
-    <artifactId>dao-doraemon-excel</artifactId>
-
+    <artifactId>excel-spring-boot-starter</artifactId>
+    <description>Excel Web Enhancements</description>
+    <url>https://github.com/Suzzt/dao-doraemon/excel-spring-boot-starter</url>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.dao.doraemon</groupId>
             <artifactId>dao-doraemon-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -39,5 +38,21 @@
             <version>3.22.12</version>
         </dependency>
     </dependencies>
-
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Suzzt</name>
+            <email>1058772978@qq.com</email>
+        </developer>
+    </developers>
+    <scm>
+        <connection>https://github.com/Suzzt/dao-doraemon.git</connection>
+        <developerConnection>scm:git:https://github.com/Suzzt/dao-doraemon.git</developerConnection>
+        <url>https://github.com/Suzzt/dao-doraemon</url>
+    </scm>
 </project>

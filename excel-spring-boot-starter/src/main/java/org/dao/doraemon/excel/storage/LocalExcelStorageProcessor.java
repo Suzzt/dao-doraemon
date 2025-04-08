@@ -1,6 +1,8 @@
 package org.dao.doraemon.excel.storage;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -19,6 +21,8 @@ import java.util.Enumeration;
  */
 @Component
 public class LocalExcelStorageProcessor implements ExcelStorageProcessor {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(LocalExcelStorageProcessor.class);
 
     @Value(value = "${server.servlet.context-path:#{null}}")
     private String contextPath;
@@ -61,7 +65,7 @@ public class LocalExcelStorageProcessor implements ExcelStorageProcessor {
 
     @Override
     public InputStream download(String path) {
-        File file = new File(storageLocalPath + path);
+        File file = new File(storageLocalPath + File.separator + path);
         if (file.exists()) {
             try {
                 return new FileInputStream(file);
@@ -69,6 +73,7 @@ public class LocalExcelStorageProcessor implements ExcelStorageProcessor {
                 throw new RuntimeException(e);
             }
         }
+        LOGGER.error("文件不存在：{}", file.getAbsolutePath());
         return null;
     }
 

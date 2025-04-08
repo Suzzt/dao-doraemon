@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.dao.doraemon</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
   </parent>
 
   <artifactId>dao-doraemon-example</artifactId>
@@ -20,20 +20,20 @@
   <dependencies>
     <dependency>
       <groupId>org.dao.doraemon</groupId>
-      <artifactId>dao-doraemon-excel</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <artifactId>excel-spring-boot-starter</artifactId>
+      <version>1.0.0</version>
     </dependency>
     
     <dependency>
       <groupId>org.dao.doraemon</groupId>
-      <artifactId>dao-doraemon-sensitive</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <artifactId>sensitive-spring-boot-starter</artifactId>
+      <version>1.0.0</version>
     </dependency>
     
     <dependency>
       <groupId>org.dao.doraemon</groupId>
-      <artifactId>dao-doraemon-database</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <artifactId>database-spring-boot-starter</artifactId>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
