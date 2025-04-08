@@ -4,18 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <description>Public Capacity Parent Project</description>
-    <groupId>org.dao.doraemon</groupId>
+    <groupId>io.github.suzzt</groupId>
     <artifactId>parent</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
     <modules>
-        <module>excel-spring-boot-starter</module>
+        <module>dao-doraemon-excel-spring-boot-starter</module>
         <module>dao-doraemon-example</module>
-        <module>database-spring-boot-starter</module>
-        <module>log-spring-boot-starter</module>
-        <module>download-center-spring-boot-starter</module>
+        <module>dao-doraemon-database-spring-boot-starter</module>
+        <module>dao-doraemon-log-spring-boot-starter</module>
+        <module>dao-doraemon-download-center-spring-boot-starter</module>
         <module>dao-doraemon-core</module>
-        <module>sensitive-spring-boot-starter</module>
+        <module>dao-doraemon-sensitive-spring-boot-starter</module>
     </modules>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -90,23 +90,6 @@
             <version>${logback-version}</version>
         </dependency>
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <artifactId>mybatis</artifactId>
-                <groupId>org.mybatis</groupId>
-                <version>${mybatis-version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mybatis</groupId>
-                <artifactId>mybatis-spring</artifactId>
-                <version>${mybatis-spring-version}</version>
-                <scope>provided</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <plugins>

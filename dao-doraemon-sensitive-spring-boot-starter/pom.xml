@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.suzzt</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+    <artifactId>dao-doraemon-sensitive-spring-boot-starter</artifactId>
+    <description>Sensitive Web Enhancements</description>
+    <url>https://github.com/Suzzt/dao-doraemon/dao-doraemon-sensitive-spring-boot-starter</url>
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>io.github.suzzt</groupId>
+            <artifactId>dao-doraemon-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Suzzt</name>
+            <email>1058772978@qq.com</email>
+        </developer>
+    </developers>
+    <scm>
+        <connection>https://github.com/Suzzt/dao-doraemon.git</connection>
+        <developerConnection>scm:git:https://github.com/Suzzt/dao-doraemon.git</developerConnection>
+        <url>https://github.com/Suzzt/dao-doraemon</url>
+    </scm>
+</project>

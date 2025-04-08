@@ -7,12 +7,12 @@
 
   <parent>
     <artifactId>parent</artifactId>
-    <groupId>org.dao.doraemon</groupId>
+    <groupId>io.github.suzzt</groupId>
     <version>1.0.0</version>
   </parent>
-
-  <artifactId>database-spring-boot-starter</artifactId>
-
+  <artifactId>dao-doraemon-database-spring-boot-starter</artifactId>
+  <description>Database Web Enhancements</description>
+  <url>https://github.com/Suzzt/dao-doraemon/dao-doraemon-database-spring-boot-starter</url>
   <properties>
     <maven.compiler.source>8</maven.compiler.source>
     <maven.compiler.target>8</maven.compiler.target>
@@ -20,24 +20,45 @@
   </properties>
   <dependencies>
     <dependency>
-      <artifactId>spring-boot-starter-aop</artifactId>
       <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-aop</artifactId>
+      <version>${spring-boot.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <artifactId>mybatis</artifactId>
       <groupId>org.mybatis</groupId>
+      <version>${mybatis-version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <artifactId>mybatis-spring</artifactId>
       <groupId>org.mybatis</groupId>
+      <version>${mybatis-spring-version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-jdbc</artifactId>
+      <version>${spring-boot.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  <licenses>
+    <license>
+      <name>Apache License 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Suzzt</name>
+      <email>1058772978@qq.com</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>https://github.com/Suzzt/dao-doraemon.git</connection>
+    <developerConnection>scm:git:https://github.com/Suzzt/dao-doraemon.git</developerConnection>
+    <url>https://github.com/Suzzt/dao-doraemon</url>
+  </scm>
 </project>

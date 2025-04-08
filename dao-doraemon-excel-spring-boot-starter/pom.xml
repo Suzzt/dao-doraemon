@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.dao.doraemon</groupId>
+        <groupId>io.github.suzzt</groupId>
         <artifactId>parent</artifactId>
         <version>1.0.0</version>
     </parent>
-    <artifactId>excel-spring-boot-starter</artifactId>
+    <artifactId>dao-doraemon-excel-spring-boot-starter</artifactId>
     <description>Excel Web Enhancements</description>
-    <url>https://github.com/Suzzt/dao-doraemon/excel-spring-boot-starter</url>
+    <url>https://github.com/Suzzt/dao-doraemon/dao-doraemon-excel-spring-boot-starter</url>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
@@ -18,7 +18,7 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.dao.doraemon</groupId>
+            <groupId>io.github.suzzt</groupId>
             <artifactId>dao-doraemon-core</artifactId>
             <version>1.0.0</version>
         </dependency>
