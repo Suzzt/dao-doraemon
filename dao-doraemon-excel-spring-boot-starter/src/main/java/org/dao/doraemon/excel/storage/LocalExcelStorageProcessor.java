@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -57,11 +58,19 @@ public class LocalExcelStorageProcessor implements ExcelStorageProcessor {
         }
 
         String ipAddress = getIpAddress();
-        if (StringUtils.hasLength(contextPath)) {
-            contextPath = contextPath.startsWith("/") ? contextPath : "/" + contextPath;
+        UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host(ipAddress)
+                .port(serverPort);
+
+        String normalizedContextPath = formatContextPath(contextPath);
+        if (StringUtils.hasLength(normalizedContextPath)) {
+            builder.pathSegment(normalizedContextPath.split("/"));
         }
-        return "http://" + ipAddress + ":" + serverPort + (contextPath != null ? contextPath : "") + "/excel/download/" + fileName;
-    }
+
+        return builder.path("/excel/download/{fileName}")
+                .buildAndExpand(fileName)
+                .toUriString(); }
 
     @Override
     public InputStream download(String path) {
@@ -98,5 +107,10 @@ public class LocalExcelStorageProcessor implements ExcelStorageProcessor {
             throw new RuntimeException(e);
         }
         return "127.0.0.1";
+    }
+
+    private String formatContextPath(String path) {
+        if (!StringUtils.hasLength(path)) return "";
+        return path.replaceAll("^/+|/+$", "");
     }
 }

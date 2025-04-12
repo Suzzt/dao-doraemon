@@ -41,7 +41,10 @@ public class ExcelAutoConfiguration implements EnvironmentAware {
     @ConditionalOnMissingBean(ExcelStorageProcessor.class)
     public ExcelStorageProcessor excelStorageProcessor() {
         String localPath  = environment.getProperty("dao_doraemon.excel.storage.local_path");
-        localPath = StringUtils.isBlank(localPath) ? "/data/excel/storage/" : localPath;
+        localPath = StringUtils.isBlank(localPath) ? "/data/excel/storage" : localPath;
+        if (localPath.endsWith("/")) {
+            localPath = localPath.substring(0, localPath.length() - 1);
+        }
         return new LocalExcelStorageProcessor(localPath);
     }
 
